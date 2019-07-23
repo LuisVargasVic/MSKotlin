@@ -3,20 +3,19 @@
         xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
         <variable
-                name="video"
+                name="movie"
                 type="com.rappi.moviesdb.domain.Movie" />
 
         <variable
-                name="videoCallback"
+                name="movieListener"
                 type="com.rappi.moviesdb.presentation.MovieAdapter.MovieClickListener" />
     </data>
 
-
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="180dp"
+            android:padding="2dp">
 
         <ImageView
                 android:id="@+id/iv_movie_image"
@@ -26,8 +25,27 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/guideline"
                 android:contentDescription="@string/movie"/>
+
+        <TextView
+                android:id="@+id/tv_movie_average"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:textColor="@android:color/black"
+                android:textSize="14sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/iv_movie_image"
+                tools:text="8.5"/>
+
+        <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_percent=".9"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

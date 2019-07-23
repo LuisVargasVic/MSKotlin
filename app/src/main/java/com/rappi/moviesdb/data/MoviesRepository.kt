@@ -15,9 +15,6 @@ import kotlinx.coroutines.withContext
 
 class MoviesRepository(private val database: MoviesDatabase) {
 
-    /**
-     * A playlist of videos that can be shown on the screen.
-     */
     val movies: LiveData<List<Movie>> =
         Transformations.map(database.movieDao.getMovies()) {
             MoviesDatabase.asDomainModel(it)

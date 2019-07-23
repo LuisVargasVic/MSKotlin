@@ -21,6 +21,10 @@ class MovieAdapter(var mMoviesList: List<Movie>?, var mMovieClickListener: Movie
         fun movieClicked(movie: Movie?)
     }
 
+    fun setMoviesList(movieList: List<Movie>) {
+        mMoviesList = movieList
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MoviesViewHolder {
         val dataBinding: MovieItemBinding = DataBindingUtil.inflate(
             LayoutInflater.from(parent.context),
@@ -39,8 +43,8 @@ class MovieAdapter(var mMoviesList: List<Movie>?, var mMovieClickListener: Movie
     }
 
     class MoviesViewHolder(
-        val movieItemBinding: MovieItemBinding,
-        val mMovieClickListener: MovieClickListener
+        private val movieItemBinding: MovieItemBinding,
+        private val mMovieClickListener: MovieClickListener
     ) : RecyclerView.ViewHolder(movieItemBinding.root), View.OnClickListener {
 
         var mMovie: Movie? = null
@@ -55,6 +59,7 @@ class MovieAdapter(var mMoviesList: List<Movie>?, var mMovieClickListener: Movie
                 .get()
                 .load(Uri.parse(BASE_URL + movie?.posterPath))
                 .into(movieItemBinding.ivMovieImage)
+            movieItemBinding.tvMovieAverage.text = movie?.voteAverage.toString()
         }
 
         override fun onClick(view: View) {
@@ -63,6 +68,6 @@ class MovieAdapter(var mMoviesList: List<Movie>?, var mMovieClickListener: Movie
     }
 
     companion object {
-        private val BASE_URL = "https://image.tmdb.org/t/p/w185"
+        private const val BASE_URL = "https://image.tmdb.org/t/p/w185"
     }
 }

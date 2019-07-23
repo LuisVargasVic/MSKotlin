@@ -12,26 +12,45 @@ import kotlinx.coroutines.launch
 /**
  * Created by Luis Vargas on 2019-07-22.
  */
-class MainViewModel(application: Application) : AndroidViewModel(application) {
+
+class MainViewModel(application: Application, networkConnection: Boolean) : AndroidViewModel(application) {
 
     private val viewModelJob = SupervisorJob()
 
     private val viewModelScope = CoroutineScope(viewModelJob + Dispatchers.Main)
 
     private val database = MoviesDatabase.getDatabase(application)
-    private val moviesRepository = MoviesRepository(database)
+    val moviesRepository = MoviesRepository(database)
 
     init {
-        viewModelScope.launch {
-            moviesRepository.refreshMovies(SORT_POPULAR)
-        }
+        sortMovies(SORT_POPULAR, networkConnection)
     }
-
-    val movies = moviesRepository.movies
 
     companion object {
         const val SORT_POPULAR = "popular"
         const val SORT_TOP = "top_rated"
+        const val SORT_UPCOMING = "upcoming"
     }
 
+    fun sortMovies(sort: String, networkConnection: Boolean) {
+        if (networkConnection) {
+            when (sort) {
+                SORT_POPULAR -> {
+                    viewModelScope.launch {
+                        moviesRepository.refreshMovies(SORT_POPULAR)
+                    }
+                }
+                SORT_TOP -> {
+                    viewModelScope.launch {
+                        moviesRepository.refreshMovies(SORT_TOP)
+                    }
+                }
+                SORT_UPCOMING -> {
+                    viewModelScope.launch {
+                        moviesRepository.refreshMovies(SORT_UPCOMING)
+                    }
+                }
+            }
+        }
+    }
 }

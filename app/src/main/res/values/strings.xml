@@ -1,4 +1,16 @@
 <resources>
     <string name="app_name">MoviesDB</string>
+    <string name="popular">Popular Movies</string>
+    <string name="top_rated">Top Rated Movies</string>
+    <string name="upcoming">Upcoming Movies</string>
     <string name="movie">Movie</string>
+    <string name="action_popular">Sort by popularity</string>
+    <string name="action_top">Sort by top rated</string>
+    <string name="action_upcoming">Sort by upcoming</string>
+    <string name="average_vote">Average vote: </string>
+    <string name="release_date">Release date: </string>
+    <string name="vote_count">Votes: </string>
+    <string name="popularity">Popularity: </string>
+    <string name="original_language">Original Language: </string>
+    <string name="overview">Overview: </string>
 </resources>

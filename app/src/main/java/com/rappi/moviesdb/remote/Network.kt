@@ -1,7 +1,7 @@
 package com.rappi.moviesdb.remote
 
-import com.google.gson.GsonBuilder
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -14,10 +14,8 @@ object Network {
     private val retrofit = Retrofit.Builder()
         .baseUrl("https://api.themoviedb.org/3/")
         .addCallAdapterFactory(CoroutineCallAdapterFactory())
-        .addConverterFactory(
-            GsonConverterFactory.create(
-                GsonBuilder()
-                    .create()))
+        .addConverterFactory(GsonConverterFactory.create())
+        .client(OkHttpClient.Builder().build())
         .build()
 
     val movieService = retrofit.create(MovieService::class.java)
