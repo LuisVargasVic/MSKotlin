@@ -1,4 +1,4 @@
-package com.rappi.moviesdb.presentation
+package com.rappi.moviesdb.presentation.movies
 
 import android.net.Uri
 import android.view.LayoutInflater
@@ -15,7 +15,7 @@ import com.squareup.picasso.Picasso
  * Created by Luis Vargas on 2019-07-22.
  */
 
-class MovieAdapter(var mMoviesList: List<Movie>?, var mMovieClickListener: MovieClickListener) : RecyclerView.Adapter<MovieAdapter.MoviesViewHolder>() {
+class MoviesAdapter(var mMoviesList: List<Movie>?, var mMovieClickListener: MovieClickListener) : RecyclerView.Adapter<MoviesAdapter.MoviesViewHolder>() {
 
     interface MovieClickListener {
         fun movieClicked(movie: Movie?)

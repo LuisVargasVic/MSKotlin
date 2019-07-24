@@ -5,14 +5,16 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.rappi.moviesdb.domain.Movie
+import com.rappi.moviesdb.domain.Serie
 
 /**
  * Created by Luis Vargas on 2019-07-22.
  */
 
-@Database(entities = [DatabaseMovie::class], version = 1)
+@Database(entities = [DatabaseMovie::class, DatabaseSerie::class], version = 1)
 abstract class MoviesDatabase : RoomDatabase() {
     abstract val movieDao: MovieDao
+    abstract val serieDao: SerieDao
 
     companion object {
 
@@ -43,6 +45,23 @@ abstract class MoviesDatabase : RoomDatabase() {
                     it.adult,
                     it.overview,
                     it.releaseDate)
+            }
+        }
+
+        fun serieAsDomainModel(list: List<DatabaseSerie>): List<Serie> {
+            return list.map {
+                Serie(
+                    it.id,
+                    it.voteCount,
+                    it.voteAverage,
+                    it.name,
+                    it.popularity,
+                    it.posterPath,
+                    it.originalLanguage,
+                    it.originalName,
+                    it.backdropPath,
+                    it.overview,
+                    it.firstAirDate)
             }
         }
     }

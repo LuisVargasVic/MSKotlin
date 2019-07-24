@@ -1,8 +1,8 @@
-package com.rappi.moviesdb.presentation
+package com.rappi.moviesdb.presentation.series
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import com.rappi.moviesdb.data.MoviesRepository
+import android.content.Context
+import androidx.lifecycle.ViewModel
+import com.rappi.moviesdb.data.SeriesRepository
 import com.rappi.moviesdb.database.MoviesDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -10,20 +10,20 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
 /**
- * Created by Luis Vargas on 2019-07-22.
+ * Created by Luis Vargas on 2019-07-24.
  */
 
-class MainViewModel(application: Application, networkConnection: Boolean) : AndroidViewModel(application) {
+class SeriesViewModel(context: Context, networkConnection: Boolean) : ViewModel() {
 
     private val viewModelJob = SupervisorJob()
 
     private val viewModelScope = CoroutineScope(viewModelJob + Dispatchers.Main)
 
-    private val database = MoviesDatabase.getDatabase(application)
-    val moviesRepository = MoviesRepository(database)
+    private val database = MoviesDatabase.getDatabase(context)
+    val seriesRepository = SeriesRepository(database)
 
     init {
-        sortMovies(SORT_POPULAR, networkConnection)
+        sortSeries(SORT_POPULAR, networkConnection)
     }
 
     companion object {
@@ -32,22 +32,22 @@ class MainViewModel(application: Application, networkConnection: Boolean) : Andr
         const val SORT_UPCOMING = "upcoming"
     }
 
-    fun sortMovies(sort: String, networkConnection: Boolean) {
+    fun sortSeries(sort: String, networkConnection: Boolean) {
         if (networkConnection) {
             when (sort) {
                 SORT_POPULAR -> {
                     viewModelScope.launch {
-                        moviesRepository.refreshMovies(SORT_POPULAR)
+                        seriesRepository.refreshSeries(SORT_POPULAR)
                     }
                 }
                 SORT_TOP -> {
                     viewModelScope.launch {
-                        moviesRepository.refreshMovies(SORT_TOP)
+                        seriesRepository.refreshSeries(SORT_TOP)
                     }
                 }
                 SORT_UPCOMING -> {
                     viewModelScope.launch {
-                        moviesRepository.refreshMovies(SORT_UPCOMING)
+                        seriesRepository.refreshSeries(SORT_UPCOMING)
                     }
                 }
             }

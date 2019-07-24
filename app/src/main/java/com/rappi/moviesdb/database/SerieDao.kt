@@ -7,14 +7,14 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 
 /**
- * Created by Luis Vargas on 2019-07-22.
+ * Created by Luis Vargas on 2019-07-24.
  */
 
 @Dao
-interface MovieDao {
-    @Query("SELECT * FROM DatabaseMovie")
-    fun getMovies(): LiveData<List<DatabaseMovie>>
+interface SerieDao {
+    @Query("SELECT * FROM DatabaseSerie")
+    fun getSeries(): LiveData<List<DatabaseSerie>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(vararg movies: DatabaseMovie)
+    fun insertAll(vararg series: DatabaseSerie)
 }

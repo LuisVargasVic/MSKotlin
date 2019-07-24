@@ -3,17 +3,6 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-
-        <import type="android.view.View"/>
-
-        <import type="androidx.core.content.ContextCompat"/>
-
-        <variable
-                name="viewModel"
-                type="com.rappi.moviesdb.presentation.MainViewModel"/>
-
-    </data>
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -27,11 +16,18 @@
 
         </androidx.appcompat.widget.Toolbar>
 
-        <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_movies"
+        <FrameLayout
+                android:id="@+id/nav_host_container"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                app:layout_constraintTop_toBottomOf="@+id/toolbar"
+                app:layout_constraintTop_toBottomOf="@id/toolbar"
+                app:layout_constraintBottom_toTopOf="@id/bottom_nav"/>
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+                android:id="@+id/bottom_nav"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:menu="@menu/bottom_navigation"
                 app:layout_constraintBottom_toBottomOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

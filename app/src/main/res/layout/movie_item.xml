@@ -9,7 +9,7 @@
 
         <variable
                 name="movieListener"
-                type="com.rappi.moviesdb.presentation.MovieAdapter.MovieClickListener" />
+                type="com.rappi.moviesdb.presentation.movies.MoviesAdapter" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

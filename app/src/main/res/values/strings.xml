@@ -7,10 +7,17 @@
     <string name="action_popular">Sort by popularity</string>
     <string name="action_top">Sort by top rated</string>
     <string name="action_upcoming">Sort by upcoming</string>
-    <string name="average_vote">Average vote: </string>
-    <string name="release_date">Release date: </string>
-    <string name="vote_count">Votes: </string>
-    <string name="popularity">Popularity: </string>
-    <string name="original_language">Original Language: </string>
-    <string name="overview">Overview: </string>
+    <string name="average_vote">Average vote:</string>
+    <string name="release_date">Release date:</string>
+    <string name="vote_count">Votes:</string>
+    <string name="popularity">Popularity:</string>
+    <string name="original_language">Original Language:</string>
+    <string name="overview">Overview:</string>
+    <string name="title_movies">Movies</string>
+    <string name="title_series">Series</string>
+    <string name="cd_movies">Movies</string>
+    <string name="cd_series">Series</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

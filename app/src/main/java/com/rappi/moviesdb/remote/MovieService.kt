@@ -12,5 +12,8 @@ import retrofit2.http.Query
 interface MovieService {
     @GET("movie/{sort}")
     fun getMovies(@Path("sort") sort: String, @Query("api_key") api: String): Deferred<NetworkMovieContainer>
+
+    @GET("tv/{sort}")
+    fun getSeries(@Path("sort") sort: String, @Query("api_key") api: String): Deferred<NetworkSerieContainer>
 }
 
