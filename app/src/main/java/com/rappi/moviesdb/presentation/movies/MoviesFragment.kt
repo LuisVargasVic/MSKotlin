@@ -7,8 +7,10 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.rappi.moviesdb.R
 import com.rappi.moviesdb.databinding.FragmentMoviesBinding
@@ -23,10 +25,15 @@ class MoviesFragment : Fragment(), MoviesAdapter.MovieClickListener {
     private lateinit var viewDataBinding: FragmentMoviesBinding
     private var typeSelected = MoviesViewModel.SORT_POPULAR
     private lateinit var mAdapter: MoviesAdapter
+    private var title = R.string.popular
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+    }
+
+    companion object {
+        const val MOVIE_KEY = "movie"
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -36,6 +43,7 @@ class MoviesFragment : Fragment(), MoviesAdapter.MovieClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        (context as MainActivity).supportActionBar?.setTitle(title)
         viewDataBinding.viewModel =
             MoviesViewModel(context!!, isNetworkAvailable())
 
@@ -75,6 +83,7 @@ class MoviesFragment : Fragment(), MoviesAdapter.MovieClickListener {
                 }
                 typeSelected = MoviesViewModel.SORT_POPULAR
                 (context as MainActivity).supportActionBar?.setTitle(R.string.popular)
+                title = R.string.popular
                 true
             }
             R.id.action_top -> {
@@ -88,6 +97,7 @@ class MoviesFragment : Fragment(), MoviesAdapter.MovieClickListener {
                 }
                 typeSelected = MoviesViewModel.SORT_TOP
                 (context as MainActivity).supportActionBar?.setTitle(R.string.top_rated)
+                title = R.string.top_rated
                 true
             }
             R.id.action_upcoming -> {
@@ -101,6 +111,7 @@ class MoviesFragment : Fragment(), MoviesAdapter.MovieClickListener {
                 }
                 typeSelected = MoviesViewModel.SORT_UPCOMING
                 (context as MainActivity).supportActionBar?.setTitle(R.string.upcoming)
+                title = R.string.upcoming
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -108,7 +119,11 @@ class MoviesFragment : Fragment(), MoviesAdapter.MovieClickListener {
     }
 
     override fun movieClicked(movie: Movie?) {
+        val bundle = bundleOf(MOVIE_KEY to movie)
 
+        view?.findNavController()?.navigate(
+            R.id.action_movies_to_movie_detail,
+            bundle)
     }
 
     private fun isNetworkAvailable(): Boolean {

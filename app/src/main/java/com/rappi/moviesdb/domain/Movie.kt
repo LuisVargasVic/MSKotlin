@@ -1,5 +1,7 @@
 package com.rappi.moviesdb.domain
 
+import java.io.Serializable
+
 /**
  * Created by Luis Vargas on 2019-07-22.
  */
@@ -18,4 +20,4 @@ data class Movie(
     val adult: Boolean,
     val overview: String,
     val releaseDate: String
-)
+): Serializable
