@@ -1,6 +1,8 @@
 package com.rappi.moviesdb.presentation.movies
 
+import android.app.AlertDialog
 import android.content.Context
+import android.content.DialogInterface
 import android.net.ConnectivityManager
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,7 +14,10 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
 import com.rappi.moviesdb.R
+import com.rappi.moviesdb.data.MoviesRepository.Companion.MOVIE_TYPE
 import com.rappi.moviesdb.databinding.FragmentMoviesBinding
 import com.rappi.moviesdb.domain.Movie
 import com.rappi.moviesdb.presentation.MainActivity
@@ -68,15 +73,54 @@ class MoviesFragment : Fragment(), MoviesAdapter.MovieClickListener {
             }
             mAdapter.notifyDataSetChanged()
         })
+
+        viewDataBinding.viewModel?.moviesRepository?.moviesCategories?.observe(this, Observer {
+
+        })
+
+        viewDataBinding.viewModel?.moviesRepository?.categories?.observe(this, Observer {
+
+        })
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when(item.itemId) {
+            R.id.action_categories -> {
+                val view = layoutInflater.inflate(R.layout.categories, null)
+                val chipGroup = view.findViewById<ChipGroup>(R.id.chip_group)
+                for (category in viewDataBinding.viewModel?.moviesRepository?.categories?.value ?: mutableListOf()) {
+                    if (category.type == MOVIE_TYPE){
+                        val chip = Chip(chipGroup.context, null, R.style.Choice)
+                        chip.isCheckable = true
+                        chip.setOnCheckedChangeListener { _, isChecked ->
+                            if (isChecked) {
+                                viewDataBinding.viewModel?.select(category.id)
+                            } else {
+                                viewDataBinding.viewModel?.deselect(category.id)
+                            }
+                        }
+                        chip.setOnClickListener {}
+                        chip.text = category.name
+                        chipGroup.addView(chip)
+                    }
+                }
+                val alertDialog = AlertDialog.Builder(context!!)
+                alertDialog.setView(view)
+                alertDialog.setPositiveButton("UPDATE") { dialogInterface: DialogInterface, i: Int ->
+                    val movies = viewDataBinding.viewModel?.categoriesSelected()!!
+                    val moviesSelected = movies.createSubList(typeSelected, 0, 20)
+                    mAdapter.setMoviesList(moviesSelected)
+                    mAdapter.notifyDataSetChanged()
+                    dialogInterface.dismiss()
+                }
+                alertDialog.show()
+                true
+            }
             R.id.action_popular -> {
                 if (isNetworkAvailable()) {
                     viewDataBinding.viewModel?.sortMovies(MoviesViewModel.SORT_POPULAR, isNetworkAvailable())
                 } else {
-                    viewDataBinding.viewModel?.moviesRepository?.movies?.value?.createSubList(MoviesViewModel.SORT_POPULAR, 0,20)?.let {
+                    viewDataBinding.viewModel?.categoriesSelected()?.createSubList(MoviesViewModel.SORT_POPULAR, 0,20)?.let {
                         mAdapter.setMoviesList(it)
                     }
                     mAdapter.notifyDataSetChanged()
@@ -90,7 +134,7 @@ class MoviesFragment : Fragment(), MoviesAdapter.MovieClickListener {
                 if (isNetworkAvailable()) {
                     viewDataBinding.viewModel?.sortMovies(MoviesViewModel.SORT_TOP, isNetworkAvailable())
                 } else {
-                    viewDataBinding.viewModel?.moviesRepository?.movies?.value?.createSubList(MoviesViewModel.SORT_TOP, 0,20)?.let {
+                    viewDataBinding.viewModel?.categoriesSelected()?.createSubList(MoviesViewModel.SORT_TOP, 0,20)?.let {
                         mAdapter.setMoviesList(it)
                     }
                     mAdapter.notifyDataSetChanged()
@@ -104,7 +148,7 @@ class MoviesFragment : Fragment(), MoviesAdapter.MovieClickListener {
                 if (isNetworkAvailable()) {
                     viewDataBinding.viewModel?.sortMovies(MoviesViewModel.SORT_UPCOMING, isNetworkAvailable())
                 } else {
-                    viewDataBinding.viewModel?.moviesRepository?.movies?.value?.createSubList(MoviesViewModel.SORT_UPCOMING, 0,20)?.let {
+                    viewDataBinding.viewModel?.categoriesSelected()?.createSubList(MoviesViewModel.SORT_UPCOMING, 0,20)?.let {
                         mAdapter.setMoviesList(it)
                     }
                     mAdapter.notifyDataSetChanged()
@@ -133,20 +177,33 @@ class MoviesFragment : Fragment(), MoviesAdapter.MovieClickListener {
     }
 
     private fun List<Movie>.createSubList(type: String, from: Int, to: Int): List<Movie> {
-        if (this.size >= to) {
-            return when (type) {
-                MoviesViewModel.SORT_POPULAR -> this.sortedByDescending {it.popularity}.subList(from, to)
-                MoviesViewModel.SORT_TOP -> this.sortedByDescending {it.voteAverage}.subList(from, to)
-                else -> {
-                    val dateTimeStrToLocalDateTime: (Movie) -> Date = {
-                        val format: DateFormat = SimpleDateFormat("yyyy-M-d", Locale.getDefault())
-                        format.parse(it.releaseDate)!!
-                    }
+        return when (type) {
+            MoviesViewModel.SORT_POPULAR -> {
+                if (this.size >= to) {
+                    this.sortedByDescending { it.popularity }.subList(from, to)
+                } else {
+                    this.sortedByDescending { it.popularity }
+                }
+            }
+            MoviesViewModel.SORT_TOP -> {
+                if (this.size >= to) {
+                    this.sortedByDescending { it.voteAverage }.subList(from, to)
+                } else {
+                    this.sortedByDescending { it.voteAverage }
+                }
+            }
+            else -> {
+                val dateTimeStrToLocalDateTime: (Movie) -> Date = {
+                    val format: DateFormat = SimpleDateFormat("yyyy-M-d", Locale.getDefault())
+                    format.parse(it.releaseDate)!!
+                }
+                if (this.size >= to) {
                     this.sortedByDescending(dateTimeStrToLocalDateTime).subList(from, to)
+                } else {
+                    this.sortedByDescending(dateTimeStrToLocalDateTime)
                 }
             }
         }
-        return this
     }
 
 }

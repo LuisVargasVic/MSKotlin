@@ -58,6 +58,7 @@ class MoviesAdapter(var mMoviesList: List<Movie>?, var mMovieClickListener: Movi
             Picasso
                 .get()
                 .load(Uri.parse(BASE_URL + movie?.posterPath))
+                .error(R.drawable.ic_photo)
                 .into(movieItemBinding.ivMovieImage)
             movieItemBinding.tvMovieAverage.text = movie?.voteAverage.toString()
         }

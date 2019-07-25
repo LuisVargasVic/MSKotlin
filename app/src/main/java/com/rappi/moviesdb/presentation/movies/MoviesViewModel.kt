@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.rappi.moviesdb.data.MoviesRepository
 import com.rappi.moviesdb.database.MoviesDatabase
+import com.rappi.moviesdb.domain.Movie
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -21,9 +22,14 @@ class MoviesViewModel(context: Context, networkConnection: Boolean) : ViewModel(
 
     private val database = MoviesDatabase.getDatabase(context)
     val moviesRepository = MoviesRepository(database)
+    val categoriesSelected = mutableListOf<Int>()
 
     init {
-        sortMovies(SORT_POPULAR, networkConnection)
+        if (networkConnection) {
+            viewModelScope.launch {
+                moviesRepository.refreshCategories()
+            }
+        }
     }
 
     companion object {
@@ -51,6 +57,33 @@ class MoviesViewModel(context: Context, networkConnection: Boolean) : ViewModel(
                     }
                 }
             }
+        }
+    }
+
+    fun select(category: Int) {
+        categoriesSelected.add(category)
+    }
+
+    fun deselect(category: Int) {
+        categoriesSelected.remove(category)
+    }
+
+    fun categoriesSelected(): List<Movie> {
+        if (categoriesSelected.isNotEmpty()) {
+            val moviesSelected = mutableListOf<Movie>()
+            moviesRepository.moviesCategories.value?.forEach { movieCategory ->
+                if (categoriesSelected.contains(movieCategory.genreId)) {
+                    moviesRepository.movies.value?.find {
+                        it.id == movieCategory.movieId
+                    }?.let {
+                        moviesSelected.add(it)
+                    }
+                }
+            }
+            categoriesSelected.clear()
+            return moviesSelected.distinct()
+        } else {
+            return moviesRepository.movies.value!!
         }
     }
 }

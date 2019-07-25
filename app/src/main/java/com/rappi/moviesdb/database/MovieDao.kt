@@ -12,9 +12,25 @@ import androidx.room.Query
 
 @Dao
 interface MovieDao {
+
+    @Query("SELECT * FROM DatabaseCategory")
+    fun getCategories(): LiveData<List<DatabaseCategory>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAllCategories(vararg categories: DatabaseCategory)
+
     @Query("SELECT * FROM DatabaseMovie")
     fun getMovies(): LiveData<List<DatabaseMovie>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(vararg movies: DatabaseMovie)
+
+    @Query("SELECT * FROM DatabaseMovieCategory")
+    fun getMoviesCategories(): LiveData<List<DatabaseMovieCategory>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertMoviesCategories(vararg movies: DatabaseMovieCategory)
+
+    @Query("DELETE FROM DatabaseMovieCategory WHERE movieId = :movieId")
+    fun deleteByMovieId(movieId: Int)
 }

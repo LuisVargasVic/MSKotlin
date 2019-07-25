@@ -4,14 +4,21 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.rappi.moviesdb.domain.Category
 import com.rappi.moviesdb.domain.Movie
+import com.rappi.moviesdb.domain.MovieCategory
 import com.rappi.moviesdb.domain.Serie
 
 /**
  * Created by Luis Vargas on 2019-07-22.
  */
 
-@Database(entities = [DatabaseMovie::class, DatabaseSerie::class], version = 1)
+@Database(entities = [
+    DatabaseCategory::class,
+    DatabaseMovie::class,
+    DatabaseMovieCategory::class,
+    DatabaseSerie::class
+], version = 1)
 abstract class MoviesDatabase : RoomDatabase() {
     abstract val movieDao: MovieDao
     abstract val serieDao: SerieDao
@@ -26,6 +33,15 @@ abstract class MoviesDatabase : RoomDatabase() {
                     MoviesDatabase::class.java, "movies").build()
             }
             return INSTANCE
+        }
+
+        fun categoriesAsDomainModel(list: List<DatabaseCategory>): List<Category> {
+            return list.map {
+                Category(
+                    it.id,
+                    it.name,
+                    it.type)
+            }
         }
 
 
@@ -45,6 +61,15 @@ abstract class MoviesDatabase : RoomDatabase() {
                     it.adult,
                     it.overview,
                     it.releaseDate)
+            }
+        }
+
+        fun moviesCategoriesAsDomainModel(list: List<DatabaseMovieCategory>): List<MovieCategory> {
+            return list.map {
+                MovieCategory(
+                    it.id,
+                    it.genreId,
+                    it.movieId)
             }
         }
 
