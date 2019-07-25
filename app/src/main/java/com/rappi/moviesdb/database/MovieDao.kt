@@ -13,11 +13,11 @@ import androidx.room.Query
 @Dao
 interface MovieDao {
 
-    @Query("SELECT * FROM DatabaseCategory")
-    fun getCategories(): LiveData<List<DatabaseCategory>>
+    @Query("SELECT * FROM DatabaseCategoryMovie")
+    fun getCategories(): LiveData<List<DatabaseCategoryMovie>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAllCategories(vararg categories: DatabaseCategory)
+    fun insertAllCategories(vararg categoryMovies: DatabaseCategoryMovie)
 
     @Query("SELECT * FROM DatabaseMovie")
     fun getMovies(): LiveData<List<DatabaseMovie>>

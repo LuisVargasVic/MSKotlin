@@ -39,7 +39,6 @@ class MovieDetailFragment : Fragment() {
     }
 
     fun setUpUI() {
-        assert(movie != null)
         Picasso
             .get()
             .load(Uri.parse(BASE_URL + movie.backdropPath))

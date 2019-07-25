@@ -8,8 +8,19 @@
     <fragment
             android:id="@+id/seriesScreen"
             android:name="com.rappi.moviesdb.presentation.series.SeriesFragment"
-            android:label="@string/title_series"
             tools:layout="@layout/fragment_movies">
+        <action
+                android:id="@+id/action_series_to_serie_detail"
+                app:destination="@id/serieDetailScreen"/>
+    </fragment>
+
+    <fragment
+            android:id="@+id/serieDetailScreen"
+            android:name="com.rappi.moviesdb.presentation.series.SerieDetailFragment"
+            tools:layout="@layout/fragment_serie_detail">
+        <argument
+                android:name="movie"
+                app:argType="com.rappi.moviesdb.domain.Serie"/>
     </fragment>
 
 </navigation>

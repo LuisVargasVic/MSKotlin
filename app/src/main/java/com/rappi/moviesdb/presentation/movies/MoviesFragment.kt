@@ -1,6 +1,5 @@
 package com.rappi.moviesdb.presentation.movies
 
-import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.net.ConnectivityManager
@@ -9,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -17,7 +17,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.rappi.moviesdb.R
-import com.rappi.moviesdb.data.MoviesRepository.Companion.MOVIE_TYPE
 import com.rappi.moviesdb.databinding.FragmentMoviesBinding
 import com.rappi.moviesdb.domain.Movie
 import com.rappi.moviesdb.presentation.MainActivity
@@ -30,7 +29,7 @@ class MoviesFragment : Fragment(), MoviesAdapter.MovieClickListener {
     private lateinit var viewDataBinding: FragmentMoviesBinding
     private var typeSelected = MoviesViewModel.SORT_POPULAR
     private lateinit var mAdapter: MoviesAdapter
-    private var title = R.string.popular
+    private var title = R.string.popular_movies
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -89,20 +88,18 @@ class MoviesFragment : Fragment(), MoviesAdapter.MovieClickListener {
                 val view = layoutInflater.inflate(R.layout.categories, null)
                 val chipGroup = view.findViewById<ChipGroup>(R.id.chip_group)
                 for (category in viewDataBinding.viewModel?.moviesRepository?.categories?.value ?: mutableListOf()) {
-                    if (category.type == MOVIE_TYPE){
-                        val chip = Chip(chipGroup.context, null, R.style.Choice)
-                        chip.isCheckable = true
-                        chip.setOnCheckedChangeListener { _, isChecked ->
-                            if (isChecked) {
-                                viewDataBinding.viewModel?.select(category.id)
-                            } else {
-                                viewDataBinding.viewModel?.deselect(category.id)
-                            }
+                    val chip = Chip(chipGroup.context, null, R.style.Choice)
+                    chip.isCheckable = true
+                    chip.setOnCheckedChangeListener { _, isChecked ->
+                        if (isChecked) {
+                            viewDataBinding.viewModel?.select(category.id)
+                        } else {
+                            viewDataBinding.viewModel?.deselect(category.id)
                         }
-                        chip.setOnClickListener {}
-                        chip.text = category.name
-                        chipGroup.addView(chip)
                     }
+                    chip.setOnClickListener {}
+                    chip.text = category.name
+                    chipGroup.addView(chip)
                 }
                 val alertDialog = AlertDialog.Builder(context!!)
                 alertDialog.setView(view)
@@ -126,8 +123,8 @@ class MoviesFragment : Fragment(), MoviesAdapter.MovieClickListener {
                     mAdapter.notifyDataSetChanged()
                 }
                 typeSelected = MoviesViewModel.SORT_POPULAR
-                (context as MainActivity).supportActionBar?.setTitle(R.string.popular)
-                title = R.string.popular
+                (context as MainActivity).supportActionBar?.setTitle(R.string.popular_movies)
+                title = R.string.popular_movies
                 true
             }
             R.id.action_top -> {
@@ -140,8 +137,8 @@ class MoviesFragment : Fragment(), MoviesAdapter.MovieClickListener {
                     mAdapter.notifyDataSetChanged()
                 }
                 typeSelected = MoviesViewModel.SORT_TOP
-                (context as MainActivity).supportActionBar?.setTitle(R.string.top_rated)
-                title = R.string.top_rated
+                (context as MainActivity).supportActionBar?.setTitle(R.string.top_rated_movies)
+                title = R.string.top_rated_movies
                 true
             }
             R.id.action_upcoming -> {
@@ -154,8 +151,8 @@ class MoviesFragment : Fragment(), MoviesAdapter.MovieClickListener {
                     mAdapter.notifyDataSetChanged()
                 }
                 typeSelected = MoviesViewModel.SORT_UPCOMING
-                (context as MainActivity).supportActionBar?.setTitle(R.string.upcoming)
-                title = R.string.upcoming
+                (context as MainActivity).supportActionBar?.setTitle(R.string.upcoming_movies)
+                title = R.string.upcoming_movies
                 true
             }
             else -> super.onOptionsItemSelected(item)

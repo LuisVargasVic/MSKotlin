@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import com.rappi.moviesdb.BuildConfig
 import com.rappi.moviesdb.database.MoviesDatabase
-import com.rappi.moviesdb.domain.Category
+import com.rappi.moviesdb.domain.CategoryMovie
 import com.rappi.moviesdb.domain.Movie
 import com.rappi.moviesdb.domain.MovieCategory
 import com.rappi.moviesdb.presentation.movies.MoviesViewModel.Companion.SORT_POPULAR
@@ -19,13 +19,9 @@ import kotlinx.coroutines.withContext
 
 class MoviesRepository(private val database: MoviesDatabase) {
 
-    companion object {
-        const val MOVIE_TYPE = "movie"
-    }
-
-    val categories: LiveData<List<Category>> =
+    val categories: LiveData<List<CategoryMovie>> =
         Transformations.map(database.movieDao.getCategories()) {
-            MoviesDatabase.categoriesAsDomainModel(it)
+            MoviesDatabase.categoryMovieAsDomainModel(it)
         }
 
     val movies: LiveData<List<Movie>> =
@@ -42,7 +38,7 @@ class MoviesRepository(private val database: MoviesDatabase) {
         try {
             withContext(Dispatchers.IO) {
                 val categories = Network.service.getMoviesCategories(BuildConfig.API_KEY).await()
-                database.movieDao.insertAllCategories(*categories.asDatabaseModel(MOVIE_TYPE))
+                database.movieDao.insertAllCategories(*categories.asDatabaseModel())
                 refreshMovies(SORT_POPULAR)
             }
         } catch (e: Exception) {

@@ -8,9 +8,8 @@ import androidx.room.PrimaryKey
  */
 
 @Entity
-data class DatabaseCategory constructor(
+data class DatabaseCategoryMovie constructor(
     @PrimaryKey
     val id: Int,
-    val name: String,
-    val type: String
+    val name: String
 )

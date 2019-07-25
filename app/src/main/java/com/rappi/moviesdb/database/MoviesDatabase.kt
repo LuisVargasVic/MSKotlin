@@ -4,20 +4,19 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.rappi.moviesdb.domain.Category
-import com.rappi.moviesdb.domain.Movie
-import com.rappi.moviesdb.domain.MovieCategory
-import com.rappi.moviesdb.domain.Serie
+import com.rappi.moviesdb.domain.*
 
 /**
  * Created by Luis Vargas on 2019-07-22.
  */
 
 @Database(entities = [
-    DatabaseCategory::class,
+    DatabaseCategoryMovie::class,
     DatabaseMovie::class,
     DatabaseMovieCategory::class,
-    DatabaseSerie::class
+    DatabaseCategorySerie::class,
+    DatabaseSerie::class,
+    DatabaseSerieCategory::class
 ], version = 1)
 abstract class MoviesDatabase : RoomDatabase() {
     abstract val movieDao: MovieDao
@@ -35,12 +34,11 @@ abstract class MoviesDatabase : RoomDatabase() {
             return INSTANCE
         }
 
-        fun categoriesAsDomainModel(list: List<DatabaseCategory>): List<Category> {
+        fun categoryMovieAsDomainModel(list: List<DatabaseCategoryMovie>): List<CategoryMovie> {
             return list.map {
-                Category(
+                CategoryMovie(
                     it.id,
-                    it.name,
-                    it.type)
+                    it.name)
             }
         }
 
@@ -73,6 +71,14 @@ abstract class MoviesDatabase : RoomDatabase() {
             }
         }
 
+        fun categorySerieAsDomainModel(list: List<DatabaseCategorySerie>): List<CategorySerie> {
+            return list.map {
+                CategorySerie(
+                    it.id,
+                    it.name)
+            }
+        }
+
         fun serieAsDomainModel(list: List<DatabaseSerie>): List<Serie> {
             return list.map {
                 Serie(
@@ -87,6 +93,15 @@ abstract class MoviesDatabase : RoomDatabase() {
                     it.backdropPath,
                     it.overview,
                     it.firstAirDate)
+            }
+        }
+
+        fun seriesCategoriesAsDomainModel(list: List<DatabaseSerieCategory>): List<SerieCategory> {
+            return list.map {
+                SerieCategory(
+                    it.id,
+                    it.genreId,
+                    it.serieId)
             }
         }
     }

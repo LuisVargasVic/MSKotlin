@@ -12,10 +12,10 @@ import retrofit2.http.Query
 interface MovieService {
 
     @GET("genre/movie/list")
-    fun getMoviesCategories(@Query("api_key") api: String): Deferred<NetworkCategoryContainer>
+    fun getMoviesCategories(@Query("api_key") api: String): Deferred<NetworkCategoryMovieContainer>
 
     @GET("genre/tv/list")
-    fun getSeriesCategories(@Query("api_key") api: String): Deferred<NetworkCategoryContainer>
+    fun getSeriesCategories(@Query("api_key") api: String): Deferred<NetworkCategorySerieContainer>
 
     @GET("movie/{sort}")
     fun getMovies(@Path("sort") sort: String, @Query("api_key") api: String): Deferred<NetworkMovieContainer>
