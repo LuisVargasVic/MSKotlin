@@ -35,6 +35,9 @@ class MoviesRepository(private val database: MSDatabase) {
             MSDatabase.moviesCategoriesAsDomainModel(it)
         }
 
+
+    val page = MutableLiveData<Int>()
+
     suspend fun refreshCategories() {
         try {
             withContext(Dispatchers.IO) {
@@ -50,10 +53,11 @@ class MoviesRepository(private val database: MSDatabase) {
     suspend fun refreshMovies(sort: String) {
         try {
             withContext(Dispatchers.IO) {
-                val movies = Network.service.getMovies(sort, BuildConfig.API_KEY).await()
+                val movies = Network.service.getMovies(sort, BuildConfig.API_KEY, page.value ?: 1).await()
                 for (movie in movies.results) {
                     database.movieDao.deleteByMovieId(movie.id)
                 }
+                page.postValue(movies.page + 1)
                 database.movieDao.insertAll(*movies.asDatabaseModel())
                 database.movieDao.insertMoviesCategories(*movies.moviesCategoriesAsDatabaseModel())
             }

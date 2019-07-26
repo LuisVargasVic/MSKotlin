@@ -21,10 +21,11 @@ class MoviesViewModel(context: Context, networkConnection: Boolean) : ViewModel(
     private val viewModelScope = CoroutineScope(viewModelJob + Dispatchers.Main)
 
     private val database = MSDatabase.getDatabase(context)
+    private val categoriesSelected = mutableListOf<Int>()
     val moviesRepository = MoviesRepository(database)
-    val categoriesSelected = mutableListOf<Int>()
 
     init {
+        moviesRepository.page.value = 1
         if (networkConnection) {
             viewModelScope.launch {
                 moviesRepository.refreshCategories()
@@ -38,7 +39,10 @@ class MoviesViewModel(context: Context, networkConnection: Boolean) : ViewModel(
         const val SORT_UPCOMING = "upcoming"
     }
 
-    fun sortMovies(sort: String, networkConnection: Boolean) {
+    fun sortMovies(sort: String, networkConnection: Boolean, init: Boolean) {
+        if (init) {
+            moviesRepository.page.value = 1
+        }
         if (networkConnection) {
             when (sort) {
                 SORT_POPULAR -> {
@@ -68,7 +72,7 @@ class MoviesViewModel(context: Context, networkConnection: Boolean) : ViewModel(
         categoriesSelected.remove(category)
     }
 
-    fun categoriesSelected(): List<Movie> {
+    fun categoriesSelected(type: String, from: Int, to: Int): List<Movie> {
         if (categoriesSelected.isNotEmpty()) {
             val moviesSelected = mutableListOf<Movie>()
             moviesRepository.moviesCategories.value?.forEach { movieCategory ->
@@ -81,9 +85,35 @@ class MoviesViewModel(context: Context, networkConnection: Boolean) : ViewModel(
                 }
             }
             categoriesSelected.clear()
-            return moviesSelected.distinct()
+            return moviesSelected.distinct().createSubList(type, from, to)
         } else {
-            return moviesRepository.movies.value!!
+            return moviesRepository.movies.value?.createSubList(type, from, to) ?: mutableListOf()
+        }
+    }
+
+    private fun List<Movie>.createSubList(type: String, from: Int, to: Int): List<Movie> {
+        return when (type) {
+            SORT_POPULAR -> {
+                if (this.size >= to) {
+                    this.sortedByDescending { it.popularity }.subList(from, to)
+                } else {
+                    this.sortedByDescending { it.popularity }
+                }
+            }
+            SORT_TOP -> {
+                if (this.size >= to) {
+                    this.sortedByDescending { it.voteAverage }.subList(from, to)
+                } else {
+                    this.sortedByDescending { it.voteAverage }
+                }
+            }
+            else -> {
+                if (this.size >= to) {
+                    this.sortedByDescending { it.releaseDate }.subList(from, to)
+                } else {
+                    this.sortedByDescending { it.releaseDate }
+                }
+            }
         }
     }
 }

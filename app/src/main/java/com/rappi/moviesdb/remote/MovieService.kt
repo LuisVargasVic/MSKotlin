@@ -20,7 +20,7 @@ interface MovieService {
     fun getSeriesCategories(@Query("api_key") api: String): Deferred<NetworkCategoryContainer>
 
     @GET("movie/{sort}")
-    fun getMovies(@Path("sort") sort: String, @Query("api_key") api: String): Deferred<NetworkMovieContainer>
+    fun getMovies(@Path("sort") sort: String, @Query("api_key") api: String, @Query("page") page: Int): Deferred<NetworkMovieContainer>
 
     @GET("tv/{sort}")
     fun getSeries(@Path("sort") sort: String, @Query("api_key") api: String): Deferred<NetworkSerieContainer>

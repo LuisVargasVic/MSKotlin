@@ -20,9 +20,6 @@ import com.rappi.moviesdb.R
 import com.rappi.moviesdb.databinding.FragmentMoviesBinding
 import com.rappi.moviesdb.domain.movies.Movie
 import com.rappi.moviesdb.presentation.MainActivity
-import java.text.DateFormat
-import java.text.SimpleDateFormat
-import java.util.*
 
 class MoviesFragment : Fragment(), MoviesAdapter.MovieClickListener {
 
@@ -57,20 +54,51 @@ class MoviesFragment : Fragment(), MoviesAdapter.MovieClickListener {
 
         mAdapter = MoviesAdapter(
             viewDataBinding.viewModel?.moviesRepository?.movies?.value,
-            this
+            this,
+            typeSelected
         )
         viewDataBinding.rvMovies.adapter = mAdapter
 
         viewDataBinding.viewModel?.moviesRepository?.movies?.observe(this, Observer {
             // size = it.size
-            when (typeSelected) {
-                MoviesViewModel.SORT_POPULAR -> mAdapter.setMoviesList(it.createSubList(
-                    MoviesViewModel.SORT_POPULAR, 0,20))
-                MoviesViewModel.SORT_TOP -> mAdapter.setMoviesList(it.createSubList(
-                    MoviesViewModel.SORT_TOP, 0,20))
-                else -> mAdapter.setMoviesList(it.createSubList(MoviesViewModel.SORT_UPCOMING, 0,20))
+            if (viewDataBinding.viewModel?.moviesRepository?.page?.value ?: 1 == 1) {
+                when (typeSelected) {
+                    MoviesViewModel.SORT_POPULAR -> {
+                        mAdapter.setTypeSelected(MoviesViewModel.SORT_POPULAR)
+                        viewDataBinding.viewModel?.categoriesSelected(MoviesViewModel.SORT_POPULAR, 0, 20)?.let {
+                            mAdapter.setMoviesList(it)
+                        }
+                    }
+                    MoviesViewModel.SORT_TOP -> {
+                        mAdapter.setTypeSelected(MoviesViewModel.SORT_TOP)
+                        viewDataBinding.viewModel?.categoriesSelected(MoviesViewModel.SORT_TOP, 0, 20)?.let {
+                            mAdapter.setMoviesList(it)
+                        }
+                    }
+                    else -> {
+                        mAdapter.setTypeSelected(MoviesViewModel.SORT_UPCOMING)
+                        viewDataBinding.viewModel?.categoriesSelected(MoviesViewModel.SORT_UPCOMING, 0, 20)?.let {
+                            mAdapter.setMoviesList(it)
+                        }
+                    }
+                }
+                mAdapter.notifyDataSetChanged()
+            } else {
+                val to = 20 * (viewDataBinding.viewModel?.moviesRepository?.page?.value ?: 0)
+                val oldSize = mAdapter.mMoviesList?.size
+                val moviesSelected = viewDataBinding.viewModel?.categoriesSelected(typeSelected, 0, to)
+                moviesSelected?.let {
+                    mAdapter.setMoviesList(it)
+                }
+                if (((oldSize ?: 0) + 20) == mAdapter.mMoviesList?.size) {
+                    viewDataBinding.rvMovies.post {
+                        mAdapter.notifyItemRangeInserted(
+                            (mAdapter.mMoviesList?.size ?: 0) - 20,
+                            mAdapter.mMoviesList?.size ?: 0
+                        )
+                    }
+                }
             }
-            mAdapter.notifyDataSetChanged()
         })
 
         viewDataBinding.viewModel?.moviesRepository?.moviesCategories?.observe(this, Observer {
@@ -78,6 +106,10 @@ class MoviesFragment : Fragment(), MoviesAdapter.MovieClickListener {
         })
 
         viewDataBinding.viewModel?.moviesRepository?.categories?.observe(this, Observer {
+
+        })
+
+        viewDataBinding.viewModel?.moviesRepository?.page?.observe(this, Observer {
 
         })
     }
@@ -104,9 +136,9 @@ class MoviesFragment : Fragment(), MoviesAdapter.MovieClickListener {
                 val alertDialog = AlertDialog.Builder(context!!)
                 alertDialog.setView(view)
                 alertDialog.setPositiveButton("UPDATE") { dialogInterface: DialogInterface, i: Int ->
-                    val movies = viewDataBinding.viewModel?.categoriesSelected()!!
-                    val moviesSelected = movies.createSubList(typeSelected, 0, 20)
-                    mAdapter.setMoviesList(moviesSelected)
+                    val movies = viewDataBinding.viewModel?.categoriesSelected(typeSelected, 0, 20)!!
+                    mAdapter.setMoviesList(movies)
+                    mAdapter.setTypeSelected(typeSelected)
                     mAdapter.notifyDataSetChanged()
                     dialogInterface.dismiss()
                 }
@@ -115,42 +147,48 @@ class MoviesFragment : Fragment(), MoviesAdapter.MovieClickListener {
             }
             R.id.action_popular -> {
                 if (isNetworkAvailable()) {
-                    viewDataBinding.viewModel?.sortMovies(MoviesViewModel.SORT_POPULAR, isNetworkAvailable())
-                } else {
-                    viewDataBinding.viewModel?.categoriesSelected()?.createSubList(MoviesViewModel.SORT_POPULAR, 0,20)?.let {
-                        mAdapter.setMoviesList(it)
-                    }
-                    mAdapter.notifyDataSetChanged()
+                    viewDataBinding.viewModel?.sortMovies(MoviesViewModel.SORT_POPULAR, isNetworkAvailable(), true)
                 }
                 typeSelected = MoviesViewModel.SORT_POPULAR
+                mAdapter = MoviesAdapter(
+                    viewDataBinding.viewModel?.categoriesSelected(typeSelected, 0,20),
+                    this,
+                    typeSelected
+                )
+                viewDataBinding.rvMovies.adapter = mAdapter
+                mAdapter.notifyDataSetChanged()
                 (context as MainActivity).supportActionBar?.setTitle(R.string.popular_movies)
                 title = R.string.popular_movies
                 true
             }
             R.id.action_top -> {
                 if (isNetworkAvailable()) {
-                    viewDataBinding.viewModel?.sortMovies(MoviesViewModel.SORT_TOP, isNetworkAvailable())
-                } else {
-                    viewDataBinding.viewModel?.categoriesSelected()?.createSubList(MoviesViewModel.SORT_TOP, 0,20)?.let {
-                        mAdapter.setMoviesList(it)
-                    }
-                    mAdapter.notifyDataSetChanged()
+                    viewDataBinding.viewModel?.sortMovies(MoviesViewModel.SORT_TOP, isNetworkAvailable(), true)
                 }
                 typeSelected = MoviesViewModel.SORT_TOP
+                mAdapter = MoviesAdapter(
+                    viewDataBinding.viewModel?.categoriesSelected(typeSelected, 0,20),
+                    this,
+                    typeSelected
+                )
+                viewDataBinding.rvMovies.adapter = mAdapter
+                mAdapter.notifyDataSetChanged()
                 (context as MainActivity).supportActionBar?.setTitle(R.string.top_rated_movies)
                 title = R.string.top_rated_movies
                 true
             }
             R.id.action_upcoming -> {
                 if (isNetworkAvailable()) {
-                    viewDataBinding.viewModel?.sortMovies(MoviesViewModel.SORT_UPCOMING, isNetworkAvailable())
-                } else {
-                    viewDataBinding.viewModel?.categoriesSelected()?.createSubList(MoviesViewModel.SORT_UPCOMING, 0,20)?.let {
-                        mAdapter.setMoviesList(it)
-                    }
-                    mAdapter.notifyDataSetChanged()
+                    viewDataBinding.viewModel?.sortMovies(MoviesViewModel.SORT_UPCOMING, isNetworkAvailable(), true)
                 }
                 typeSelected = MoviesViewModel.SORT_UPCOMING
+                mAdapter = MoviesAdapter(
+                    viewDataBinding.viewModel?.categoriesSelected(typeSelected, 0,20),
+                    this,
+                    typeSelected
+                )
+                viewDataBinding.rvMovies.adapter = mAdapter
+                mAdapter.notifyDataSetChanged()
                 (context as MainActivity).supportActionBar?.setTitle(R.string.upcoming_movies)
                 title = R.string.upcoming_movies
                 true
@@ -167,40 +205,30 @@ class MoviesFragment : Fragment(), MoviesAdapter.MovieClickListener {
             bundle)
     }
 
+    override fun bottom() {
+        if (isNetworkAvailable()) {
+            viewDataBinding.viewModel?.sortMovies(typeSelected, isNetworkAvailable(), false)
+        } else {
+            val oldSize = mAdapter.mMoviesList?.size
+            val moviesSelected = viewDataBinding.viewModel?.categoriesSelected(typeSelected, 0, (oldSize ?: 0) + 20)
+            moviesSelected?.let {
+                mAdapter.setMoviesList(it)
+            }
+            if (((oldSize ?: 0) + 20) == mAdapter.mMoviesList?.size) {
+                viewDataBinding.rvMovies.post {
+                    mAdapter.notifyItemRangeInserted(
+                        (mAdapter.mMoviesList?.size ?: 0) - 20,
+                        mAdapter.mMoviesList?.size ?: 0
+                    )
+                }
+            }
+        }
+    }
+
     private fun isNetworkAvailable(): Boolean {
         val connectivityManager = (context as MainActivity).getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetworkInfo = connectivityManager.activeNetworkInfo
         return activeNetworkInfo != null && activeNetworkInfo.isConnected
-    }
-
-    private fun List<Movie>.createSubList(type: String, from: Int, to: Int): List<Movie> {
-        return when (type) {
-            MoviesViewModel.SORT_POPULAR -> {
-                if (this.size >= to) {
-                    this.sortedByDescending { it.popularity }.subList(from, to)
-                } else {
-                    this.sortedByDescending { it.popularity }
-                }
-            }
-            MoviesViewModel.SORT_TOP -> {
-                if (this.size >= to) {
-                    this.sortedByDescending { it.voteAverage }.subList(from, to)
-                } else {
-                    this.sortedByDescending { it.voteAverage }
-                }
-            }
-            else -> {
-                val dateTimeStrToLocalDateTime: (Movie) -> Date = {
-                    val format: DateFormat = SimpleDateFormat("yyyy-M-d", Locale.getDefault())
-                    format.parse(it.releaseDate)!!
-                }
-                if (this.size >= to) {
-                    this.sortedByDescending(dateTimeStrToLocalDateTime).subList(from, to)
-                } else {
-                    this.sortedByDescending(dateTimeStrToLocalDateTime)
-                }
-            }
-        }
     }
 
 }
