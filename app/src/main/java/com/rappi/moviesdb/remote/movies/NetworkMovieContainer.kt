@@ -1,13 +1,16 @@
-package com.rappi.moviesdb.remote
+package com.rappi.moviesdb.remote.movies
 
-import com.rappi.moviesdb.database.DatabaseMovie
-import com.rappi.moviesdb.database.DatabaseMovieCategory
+import com.rappi.moviesdb.database.movies.DatabaseMovie
+import com.rappi.moviesdb.database.movies.DatabaseMovieCategory
 
 /**
  * Created by Luis Vargas on 2019-07-22.
  */
 
-data class NetworkMovieContainer(val results: List<NetworkMovie>) {
+data class NetworkMovieContainer(
+    val page: Int,
+    val results: List<NetworkMovie>
+) {
 
     fun asDatabaseModel(): Array<DatabaseMovie> {
         return results.map {
@@ -24,7 +27,8 @@ data class NetworkMovieContainer(val results: List<NetworkMovie>) {
                 it.backdropPath,
                 it.adult,
                 it.overview,
-                it.releaseDate)
+                it.releaseDate
+            )
         }.toTypedArray()
     }
 
@@ -32,10 +36,12 @@ data class NetworkMovieContainer(val results: List<NetworkMovie>) {
         val categories = mutableListOf<DatabaseMovieCategory>()
         results.map {
             it.genreIds.map { genre ->
-                categories.add(DatabaseMovieCategory(
-                    genre,
-                    it.id
-                ))
+                categories.add(
+                    DatabaseMovieCategory(
+                        genre,
+                        it.id
+                    )
+                )
             }
         }
         return categories.toTypedArray()

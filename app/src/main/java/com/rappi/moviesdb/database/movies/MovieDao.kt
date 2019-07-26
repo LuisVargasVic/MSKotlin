@@ -1,10 +1,13 @@
-package com.rappi.moviesdb.database
+package com.rappi.moviesdb.database.movies
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.rappi.moviesdb.database.movies.DatabaseCategoryMovie
+import com.rappi.moviesdb.database.movies.DatabaseMovie
+import com.rappi.moviesdb.database.movies.DatabaseMovieCategory
 
 /**
  * Created by Luis Vargas on 2019-07-22.

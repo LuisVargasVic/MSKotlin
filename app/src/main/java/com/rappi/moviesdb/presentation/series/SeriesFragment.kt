@@ -18,7 +18,7 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.rappi.moviesdb.R
 import com.rappi.moviesdb.databinding.FragmentSeriesBinding
-import com.rappi.moviesdb.domain.Serie
+import com.rappi.moviesdb.domain.series.Serie
 import com.rappi.moviesdb.presentation.MainActivity
 import java.text.DateFormat
 import java.text.SimpleDateFormat

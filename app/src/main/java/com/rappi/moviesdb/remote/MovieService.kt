@@ -1,5 +1,7 @@
 package com.rappi.moviesdb.remote
 
+import com.rappi.moviesdb.remote.movies.NetworkMovieContainer
+import com.rappi.moviesdb.remote.series.NetworkSerieContainer
 import kotlinx.coroutines.Deferred
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -12,10 +14,10 @@ import retrofit2.http.Query
 interface MovieService {
 
     @GET("genre/movie/list")
-    fun getMoviesCategories(@Query("api_key") api: String): Deferred<NetworkCategoryMovieContainer>
+    fun getMoviesCategories(@Query("api_key") api: String): Deferred<NetworkCategoryContainer>
 
     @GET("genre/tv/list")
-    fun getSeriesCategories(@Query("api_key") api: String): Deferred<NetworkCategorySerieContainer>
+    fun getSeriesCategories(@Query("api_key") api: String): Deferred<NetworkCategoryContainer>
 
     @GET("movie/{sort}")
     fun getMovies(@Path("sort") sort: String, @Query("api_key") api: String): Deferred<NetworkMovieContainer>

@@ -10,9 +10,11 @@ import retrofit2.converter.gson.GsonConverterFactory
  */
 
 object Network {
-    // Configure retrofit to parse JSON and use coroutines
+
+    private const val BASE_URL = "https://api.themoviedb.org/3/"
+
     private val retrofit = Retrofit.Builder()
-        .baseUrl("https://api.themoviedb.org/3/")
+        .baseUrl(BASE_URL)
         .addCallAdapterFactory(CoroutineCallAdapterFactory())
         .addConverterFactory(GsonConverterFactory.create())
         .client(OkHttpClient.Builder().build())

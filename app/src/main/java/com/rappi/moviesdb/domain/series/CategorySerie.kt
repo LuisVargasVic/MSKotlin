@@ -1,4 +1,4 @@
-package com.rappi.moviesdb.domain
+package com.rappi.moviesdb.domain.series
 
 /**
  * Created by Luis Vargas on 2019-07-24.

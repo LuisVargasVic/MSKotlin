@@ -4,7 +4,20 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.rappi.moviesdb.domain.*
+import com.rappi.moviesdb.database.movies.DatabaseCategoryMovie
+import com.rappi.moviesdb.database.movies.DatabaseMovie
+import com.rappi.moviesdb.database.movies.DatabaseMovieCategory
+import com.rappi.moviesdb.database.movies.MovieDao
+import com.rappi.moviesdb.database.series.DatabaseCategorySerie
+import com.rappi.moviesdb.database.series.DatabaseSerie
+import com.rappi.moviesdb.database.series.DatabaseSerieCategory
+import com.rappi.moviesdb.database.series.SerieDao
+import com.rappi.moviesdb.domain.movies.CategoryMovie
+import com.rappi.moviesdb.domain.movies.Movie
+import com.rappi.moviesdb.domain.movies.MovieCategory
+import com.rappi.moviesdb.domain.series.CategorySerie
+import com.rappi.moviesdb.domain.series.Serie
+import com.rappi.moviesdb.domain.series.SerieCategory
 
 /**
  * Created by Luis Vargas on 2019-07-22.
@@ -18,18 +31,18 @@ import com.rappi.moviesdb.domain.*
     DatabaseSerie::class,
     DatabaseSerieCategory::class
 ], version = 1)
-abstract class MoviesDatabase : RoomDatabase() {
+abstract class MSDatabase : RoomDatabase() {
     abstract val movieDao: MovieDao
     abstract val serieDao: SerieDao
 
     companion object {
 
-        private lateinit var INSTANCE: MoviesDatabase
+        private lateinit var INSTANCE: MSDatabase
 
-        fun getDatabase(context: Context): MoviesDatabase {
+        fun getDatabase(context: Context): MSDatabase {
             if (!::INSTANCE.isInitialized) {
                 INSTANCE = Room.databaseBuilder(context,
-                    MoviesDatabase::class.java, "movies").build()
+                    MSDatabase::class.java, "movies").build()
             }
             return INSTANCE
         }
@@ -38,7 +51,8 @@ abstract class MoviesDatabase : RoomDatabase() {
             return list.map {
                 CategoryMovie(
                     it.id,
-                    it.name)
+                    it.name
+                )
             }
         }
 
@@ -58,7 +72,8 @@ abstract class MoviesDatabase : RoomDatabase() {
                     it.backdropPath,
                     it.adult,
                     it.overview,
-                    it.releaseDate)
+                    it.releaseDate
+                )
             }
         }
 
@@ -67,7 +82,8 @@ abstract class MoviesDatabase : RoomDatabase() {
                 MovieCategory(
                     it.id,
                     it.genreId,
-                    it.movieId)
+                    it.movieId
+                )
             }
         }
 
@@ -75,7 +91,8 @@ abstract class MoviesDatabase : RoomDatabase() {
             return list.map {
                 CategorySerie(
                     it.id,
-                    it.name)
+                    it.name
+                )
             }
         }
 
@@ -92,7 +109,8 @@ abstract class MoviesDatabase : RoomDatabase() {
                     it.originalName,
                     it.backdropPath,
                     it.overview,
-                    it.firstAirDate)
+                    it.firstAirDate
+                )
             }
         }
 
@@ -101,7 +119,8 @@ abstract class MoviesDatabase : RoomDatabase() {
                 SerieCategory(
                     it.id,
                     it.genreId,
-                    it.serieId)
+                    it.serieId
+                )
             }
         }
     }

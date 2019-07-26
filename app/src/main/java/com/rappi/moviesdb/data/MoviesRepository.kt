@@ -2,12 +2,13 @@ package com.rappi.moviesdb.data
 
 import android.util.Log
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import com.rappi.moviesdb.BuildConfig
-import com.rappi.moviesdb.database.MoviesDatabase
-import com.rappi.moviesdb.domain.CategoryMovie
-import com.rappi.moviesdb.domain.Movie
-import com.rappi.moviesdb.domain.MovieCategory
+import com.rappi.moviesdb.database.MSDatabase
+import com.rappi.moviesdb.domain.movies.CategoryMovie
+import com.rappi.moviesdb.domain.movies.Movie
+import com.rappi.moviesdb.domain.movies.MovieCategory
 import com.rappi.moviesdb.presentation.movies.MoviesViewModel.Companion.SORT_POPULAR
 import com.rappi.moviesdb.remote.Network
 import kotlinx.coroutines.Dispatchers
@@ -17,28 +18,28 @@ import kotlinx.coroutines.withContext
  * Created by Luis Vargas on 2019-07-22.
  */
 
-class MoviesRepository(private val database: MoviesDatabase) {
+class MoviesRepository(private val database: MSDatabase) {
 
     val categories: LiveData<List<CategoryMovie>> =
         Transformations.map(database.movieDao.getCategories()) {
-            MoviesDatabase.categoryMovieAsDomainModel(it)
+            MSDatabase.categoryMovieAsDomainModel(it)
         }
 
     val movies: LiveData<List<Movie>> =
         Transformations.map(database.movieDao.getMovies()) {
-            MoviesDatabase.asDomainModel(it)
+            MSDatabase.asDomainModel(it)
         }
 
     val moviesCategories: LiveData<List<MovieCategory>> =
         Transformations.map(database.movieDao.getMoviesCategories()) {
-            MoviesDatabase.moviesCategoriesAsDomainModel(it)
+            MSDatabase.moviesCategoriesAsDomainModel(it)
         }
 
     suspend fun refreshCategories() {
         try {
             withContext(Dispatchers.IO) {
                 val categories = Network.service.getMoviesCategories(BuildConfig.API_KEY).await()
-                database.movieDao.insertAllCategories(*categories.asDatabaseModel())
+                database.movieDao.insertAllCategories(*categories.moviesAsDatabaseModel())
                 refreshMovies(SORT_POPULAR)
             }
         } catch (e: Exception) {

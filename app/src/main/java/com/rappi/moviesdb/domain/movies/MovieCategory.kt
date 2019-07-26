@@ -1,4 +1,4 @@
-package com.rappi.moviesdb.domain
+package com.rappi.moviesdb.domain.movies
 
 import java.io.Serializable
 
@@ -6,8 +6,8 @@ import java.io.Serializable
  * Created by Luis Vargas on 2019-07-24.
  */
 
-data class SerieCategory(
+data class MovieCategory(
     val id: Int,
     val genreId: Int,
-    val serieId: Int
+    val movieId: Int
 ): Serializable

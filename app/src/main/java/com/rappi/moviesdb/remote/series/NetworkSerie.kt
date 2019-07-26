@@ -1,4 +1,4 @@
-package com.rappi.moviesdb.remote
+package com.rappi.moviesdb.remote.series
 
 import com.google.gson.annotations.SerializedName
 

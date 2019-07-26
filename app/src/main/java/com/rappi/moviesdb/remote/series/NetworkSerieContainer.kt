@@ -1,7 +1,7 @@
-package com.rappi.moviesdb.remote
+package com.rappi.moviesdb.remote.series
 
-import com.rappi.moviesdb.database.DatabaseSerie
-import com.rappi.moviesdb.database.DatabaseSerieCategory
+import com.rappi.moviesdb.database.series.DatabaseSerie
+import com.rappi.moviesdb.database.series.DatabaseSerieCategory
 
 /**
  * Created by Luis Vargas on 2019-07-24.
@@ -22,7 +22,8 @@ data class NetworkSerieContainer(val results: List<NetworkSerie>) {
                 it.originalName,
                 it.backdropPath,
                 it.overview,
-                it.firstAirDate)
+                it.firstAirDate
+            )
         }.toTypedArray()
     }
 

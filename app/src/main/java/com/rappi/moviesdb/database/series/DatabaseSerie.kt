@@ -1,27 +1,24 @@
-package com.rappi.moviesdb.database
+package com.rappi.moviesdb.database.series
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 /**
- * Created by Luis Vargas on 2019-07-22.
+ * Created by Luis Vargas on 2019-07-24.
  */
 
 @Entity
-data class DatabaseMovie constructor(
+data class DatabaseSerie constructor(
     @PrimaryKey
     val id: Int,
     val voteCount: Int,
-    val video: Boolean,
     val voteAverage: Double,
-    val title: String,
+    val name: String,
     val popularity: Double,
     val posterPath: String?,
     val originalLanguage: String,
-    val originalTitle: String,
+    val originalName: String,
     val backdropPath: String?,
-    val adult: Boolean,
     val overview: String,
-    val releaseDate: String
+    val firstAirDate: String
 )
-

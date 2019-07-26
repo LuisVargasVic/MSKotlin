@@ -8,7 +8,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.rappi.moviesdb.R
 import com.rappi.moviesdb.databinding.MovieItemBinding
-import com.rappi.moviesdb.domain.Serie
+import com.rappi.moviesdb.domain.series.Serie
 import com.squareup.picasso.Picasso
 
 /**

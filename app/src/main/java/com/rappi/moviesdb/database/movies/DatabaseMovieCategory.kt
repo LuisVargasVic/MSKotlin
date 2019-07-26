@@ -1,4 +1,4 @@
-package com.rappi.moviesdb.database
+package com.rappi.moviesdb.database.movies
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -8,9 +8,9 @@ import androidx.room.PrimaryKey
  */
 
 @Entity
-data class DatabaseSerieCategory constructor(
+data class DatabaseMovieCategory constructor(
     val genreId: Int,
-    val serieId: Int
+    val movieId: Int
 ) {
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0

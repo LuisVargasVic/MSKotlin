@@ -3,8 +3,8 @@ package com.rappi.moviesdb.presentation.movies
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.rappi.moviesdb.data.MoviesRepository
-import com.rappi.moviesdb.database.MoviesDatabase
-import com.rappi.moviesdb.domain.Movie
+import com.rappi.moviesdb.database.MSDatabase
+import com.rappi.moviesdb.domain.movies.Movie
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -20,7 +20,7 @@ class MoviesViewModel(context: Context, networkConnection: Boolean) : ViewModel(
 
     private val viewModelScope = CoroutineScope(viewModelJob + Dispatchers.Main)
 
-    private val database = MoviesDatabase.getDatabase(context)
+    private val database = MSDatabase.getDatabase(context)
     val moviesRepository = MoviesRepository(database)
     val categoriesSelected = mutableListOf<Int>()
 

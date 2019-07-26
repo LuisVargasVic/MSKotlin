@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.rappi.moviesdb.R
 import com.rappi.moviesdb.databinding.FragmentSerieDetailBinding
-import com.rappi.moviesdb.domain.Serie
+import com.rappi.moviesdb.domain.series.Serie
 import com.rappi.moviesdb.presentation.MainActivity
 import com.rappi.moviesdb.presentation.series.SeriesFragment.Companion.SERIE_KEY
 import com.squareup.picasso.Picasso

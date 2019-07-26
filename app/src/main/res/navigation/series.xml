@@ -20,7 +20,7 @@
             tools:layout="@layout/fragment_serie_detail">
         <argument
                 android:name="movie"
-                app:argType="com.rappi.moviesdb.domain.Serie"/>
+                app:argType="com.rappi.moviesdb.domain.series.Serie"/>
     </fragment>
 
 </navigation>

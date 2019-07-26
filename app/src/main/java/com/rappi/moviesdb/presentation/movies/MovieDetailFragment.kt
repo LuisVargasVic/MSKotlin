@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.rappi.moviesdb.R
 import com.rappi.moviesdb.databinding.FragmentMovieDetailBinding
-import com.rappi.moviesdb.domain.Movie
+import com.rappi.moviesdb.domain.movies.Movie
 import com.rappi.moviesdb.presentation.MainActivity
 import com.rappi.moviesdb.presentation.movies.MoviesFragment.Companion.MOVIE_KEY
 import com.squareup.picasso.Picasso

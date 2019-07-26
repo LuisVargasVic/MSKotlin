@@ -1,4 +1,4 @@
-package com.rappi.moviesdb.database
+package com.rappi.moviesdb.database.movies
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

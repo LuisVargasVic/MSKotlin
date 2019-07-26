@@ -1,4 +1,4 @@
-package com.rappi.moviesdb.domain
+package com.rappi.moviesdb.domain.series
 
 import java.io.Serializable
 
