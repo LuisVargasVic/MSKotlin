@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.DialogInterface
 import android.net.ConnectivityManager
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -20,6 +21,7 @@ import com.rappi.moviesdb.R
 import com.rappi.moviesdb.databinding.FragmentMoviesBinding
 import com.rappi.moviesdb.domain.movies.Movie
 import com.rappi.moviesdb.presentation.MainActivity
+import com.rappi.moviesdb.remote.ApiStatus
 
 class MoviesFragment : Fragment(), MoviesAdapter.MovieClickListener {
 
@@ -84,18 +86,25 @@ class MoviesFragment : Fragment(), MoviesAdapter.MovieClickListener {
                 }
                 mAdapter.notifyDataSetChanged()
             } else {
+                Log.wtf("page", viewDataBinding.viewModel?.moviesRepository?.page?.value.toString())
                 val to = 20 * (viewDataBinding.viewModel?.moviesRepository?.page?.value ?: 0)
                 val oldSize = mAdapter.mMoviesList?.size
                 val moviesSelected = viewDataBinding.viewModel?.categoriesSelected(typeSelected, 0, to)
                 moviesSelected?.let {
                     mAdapter.setMoviesList(it)
                 }
-                if (((oldSize ?: 0) + 20) == mAdapter.mMoviesList?.size) {
+                Log.wtf("size", mAdapter.mMoviesList?.size.toString())
+                if (((oldSize ?: 0) + 20) >= mAdapter.mMoviesList?.size ?: 0) {
                     viewDataBinding.rvMovies.post {
                         mAdapter.notifyItemRangeInserted(
                             (mAdapter.mMoviesList?.size ?: 0) - 20,
                             mAdapter.mMoviesList?.size ?: 0
                         )
+                    }
+                } else {
+                    viewDataBinding.viewModel?.moviesRepository?.page?.value?.plus(1)
+                    if (isNetworkAvailable()) {
+                        viewDataBinding.viewModel?.sortMovies(typeSelected, isNetworkAvailable(), false)
                     }
                 }
             }
@@ -112,9 +121,23 @@ class MoviesFragment : Fragment(), MoviesAdapter.MovieClickListener {
         viewDataBinding.viewModel?.moviesRepository?.page?.observe(this, Observer {
 
         })
+
+        viewDataBinding.viewModel?.moviesRepository?.apiStatus?.observe(this, Observer {
+            if (it == ApiStatus.LOADING) {
+                viewDataBinding.pbLoad.visibility = View.VISIBLE
+                viewDataBinding.pbLoadMore.visibility = View.GONE
+            } else if (it == ApiStatus.APPENDING)  {
+                viewDataBinding.pbLoadMore.visibility = View.VISIBLE
+                viewDataBinding.pbLoad.visibility = View.GONE
+            } else {
+                viewDataBinding.pbLoadMore.visibility = View.GONE
+                viewDataBinding.pbLoad.visibility = View.GONE
+            }
+        })
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        viewDataBinding.viewModel?.categoriesSelected?.clear()
         return when(item.itemId) {
             R.id.action_categories -> {
                 val view = layoutInflater.inflate(R.layout.categories, null)
@@ -136,9 +159,16 @@ class MoviesFragment : Fragment(), MoviesAdapter.MovieClickListener {
                 val alertDialog = AlertDialog.Builder(context!!)
                 alertDialog.setView(view)
                 alertDialog.setPositiveButton("UPDATE") { dialogInterface: DialogInterface, i: Int ->
+                    if (isNetworkAvailable()) {
+                        viewDataBinding.viewModel?.sortMovies(typeSelected, isNetworkAvailable(), true)
+                    }
                     val movies = viewDataBinding.viewModel?.categoriesSelected(typeSelected, 0, 20)!!
-                    mAdapter.setMoviesList(movies)
-                    mAdapter.setTypeSelected(typeSelected)
+                    mAdapter = MoviesAdapter(
+                        movies,
+                        this,
+                        typeSelected
+                    )
+                    viewDataBinding.rvMovies.adapter = mAdapter
                     mAdapter.notifyDataSetChanged()
                     dialogInterface.dismiss()
                 }
@@ -210,16 +240,18 @@ class MoviesFragment : Fragment(), MoviesAdapter.MovieClickListener {
             viewDataBinding.viewModel?.sortMovies(typeSelected, isNetworkAvailable(), false)
         } else {
             val oldSize = mAdapter.mMoviesList?.size
-            val moviesSelected = viewDataBinding.viewModel?.categoriesSelected(typeSelected, 0, (oldSize ?: 0) + 20)
-            moviesSelected?.let {
-                mAdapter.setMoviesList(it)
-            }
-            if (((oldSize ?: 0) + 20) == mAdapter.mMoviesList?.size) {
-                viewDataBinding.rvMovies.post {
-                    mAdapter.notifyItemRangeInserted(
-                        (mAdapter.mMoviesList?.size ?: 0) - 20,
-                        mAdapter.mMoviesList?.size ?: 0
-                    )
+            if (oldSize ?: 0 >= 20) {
+                val moviesSelected = viewDataBinding.viewModel?.categoriesSelected(typeSelected, 0, (oldSize ?: 0) + 20)
+                moviesSelected?.let {
+                    mAdapter.setMoviesList(it)
+                }
+                if (((oldSize ?: 0) + 20) == mAdapter.mMoviesList?.size) {
+                    viewDataBinding.rvMovies.post {
+                        mAdapter.notifyItemRangeInserted(
+                            (mAdapter.mMoviesList?.size ?: 0) - 20,
+                            mAdapter.mMoviesList?.size ?: 0
+                        )
+                    }
                 }
             }
         }

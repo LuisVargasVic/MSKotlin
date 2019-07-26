@@ -21,7 +21,7 @@ class MoviesViewModel(context: Context, networkConnection: Boolean) : ViewModel(
     private val viewModelScope = CoroutineScope(viewModelJob + Dispatchers.Main)
 
     private val database = MSDatabase.getDatabase(context)
-    private val categoriesSelected = mutableListOf<Int>()
+    val categoriesSelected = mutableListOf<Int>()
     val moviesRepository = MoviesRepository(database)
 
     init {
@@ -84,7 +84,6 @@ class MoviesViewModel(context: Context, networkConnection: Boolean) : ViewModel(
                     }
                 }
             }
-            categoriesSelected.clear()
             return moviesSelected.distinct().createSubList(type, from, to)
         } else {
             return moviesRepository.movies.value?.createSubList(type, from, to) ?: mutableListOf()

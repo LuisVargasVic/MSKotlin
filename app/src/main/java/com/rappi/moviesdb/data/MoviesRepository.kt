@@ -10,6 +10,7 @@ import com.rappi.moviesdb.domain.movies.CategoryMovie
 import com.rappi.moviesdb.domain.movies.Movie
 import com.rappi.moviesdb.domain.movies.MovieCategory
 import com.rappi.moviesdb.presentation.movies.MoviesViewModel.Companion.SORT_POPULAR
+import com.rappi.moviesdb.remote.ApiStatus
 import com.rappi.moviesdb.remote.Network
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -35,6 +36,9 @@ class MoviesRepository(private val database: MSDatabase) {
             MSDatabase.moviesCategoriesAsDomainModel(it)
         }
 
+    private val _apiStatus = MutableLiveData<ApiStatus>()
+    val apiStatus: LiveData<ApiStatus>
+        get() = _apiStatus
 
     val page = MutableLiveData<Int>()
 
@@ -53,16 +57,23 @@ class MoviesRepository(private val database: MSDatabase) {
     suspend fun refreshMovies(sort: String) {
         try {
             withContext(Dispatchers.IO) {
+                if (page.value == 1) {
+                    _apiStatus.postValue(ApiStatus.LOADING)
+                } else {
+                    _apiStatus.postValue(ApiStatus.APPENDING)
+                }
                 val movies = Network.service.getMovies(sort, BuildConfig.API_KEY, page.value ?: 1).await()
                 for (movie in movies.results) {
                     database.movieDao.deleteByMovieId(movie.id)
                 }
                 page.postValue(movies.page + 1)
+                _apiStatus.postValue(ApiStatus.STOP)
                 database.movieDao.insertAll(*movies.asDatabaseModel())
                 database.movieDao.insertMoviesCategories(*movies.moviesCategoriesAsDatabaseModel())
             }
         } catch (e: Exception) {
             Log.wtf("Errors", e.localizedMessage)
+            _apiStatus.value = ApiStatus.STOP
         }
     }
 }
