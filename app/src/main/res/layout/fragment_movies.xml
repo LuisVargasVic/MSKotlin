@@ -32,9 +32,11 @@
 
         <TextView
                 android:id="@+id/tv_empty"
-                android:layout_width="wrap_content"
+                android:layout_width="250dp"
                 android:layout_height="wrap_content"
                 android:text="Please connect to internet and try again you have no data to navigate offline"
+                android:textColor="@android:color/black"
+                android:textSize="20sp"
                 android:visibility="gone"
                 android:gravity="center"
                 app:layout_constraintStart_toStartOf="parent"

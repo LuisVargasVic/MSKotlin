@@ -7,7 +7,10 @@ import com.rappi.moviesdb.database.series.DatabaseSerieCategory
  * Created by Luis Vargas on 2019-07-24.
  */
 
-data class NetworkSerieContainer(val results: List<NetworkSerie>) {
+data class NetworkSerieContainer(
+    val page: Int,
+    val results: List<NetworkSerie>
+) {
 
     fun asDatabaseModel(): Array<DatabaseSerie> {
         return results.map {

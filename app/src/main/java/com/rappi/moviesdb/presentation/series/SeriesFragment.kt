@@ -20,9 +20,7 @@ import com.rappi.moviesdb.R
 import com.rappi.moviesdb.databinding.FragmentSeriesBinding
 import com.rappi.moviesdb.domain.series.Serie
 import com.rappi.moviesdb.presentation.MainActivity
-import java.text.DateFormat
-import java.text.SimpleDateFormat
-import java.util.*
+import com.rappi.moviesdb.remote.ApiStatus
 
 class SeriesFragment : Fragment(), SeriesAdapter.SerieClickListener {
 
@@ -30,6 +28,7 @@ class SeriesFragment : Fragment(), SeriesAdapter.SerieClickListener {
     private var typeSelected = SeriesViewModel.SORT_POPULAR
     private lateinit var mAdapter: SeriesAdapter
     private var title = R.string.popular_series
+    private var actualPage = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,20 +56,73 @@ class SeriesFragment : Fragment(), SeriesAdapter.SerieClickListener {
 
         mAdapter = SeriesAdapter(
             viewDataBinding.viewModel?.seriesRepository?.series?.value,
-            this
+            this,
+            typeSelected
         )
         viewDataBinding.rvSeries.adapter = mAdapter
 
-        viewDataBinding.viewModel?.seriesRepository?.series?.observe(this, Observer {
-            // size = it.size
-            when (typeSelected) {
-                SeriesViewModel.SORT_POPULAR -> mAdapter.setSeriesList(it.createSubList(
-                    SeriesViewModel.SORT_POPULAR, 0,20))
-                SeriesViewModel.SORT_TOP -> mAdapter.setSeriesList(it.createSubList(
-                    SeriesViewModel.SORT_TOP, 0,20))
-                else -> mAdapter.setSeriesList(it.createSubList(SeriesViewModel.SORT_UPCOMING, 0,20))
+        viewDataBinding.btLoad.setOnClickListener {
+            viewDataBinding.viewModel?.seriesRepository?.page?.value?.plus(1)
+            if (isNetworkAvailable()) {
+                viewDataBinding.viewModel?.sortSeries(typeSelected, isNetworkAvailable(), false)
             }
-            mAdapter.notifyDataSetChanged()
+        }
+
+        actualPage = 1
+
+        viewDataBinding.viewModel?.seriesRepository?.series?.observe(this, Observer {
+            if (it.isEmpty()){
+                viewDataBinding.tvEmpty.visibility = View.VISIBLE
+            } else {
+                viewDataBinding.tvEmpty.visibility = View.GONE
+            }
+            if (viewDataBinding.viewModel?.seriesRepository?.page?.value ?: 1 == 1) {
+                when (typeSelected) {
+                    SeriesViewModel.SORT_POPULAR -> {
+                        mAdapter.setTypeSelected(SeriesViewModel.SORT_POPULAR)
+                        viewDataBinding.viewModel?.categoriesSelected(SeriesViewModel.SORT_POPULAR, 0, 20)?.let {
+                            mAdapter.setSeriesList(it)
+                        }
+                    }
+                    SeriesViewModel.SORT_TOP -> {
+                        mAdapter.setTypeSelected(SeriesViewModel.SORT_TOP)
+                        viewDataBinding.viewModel?.categoriesSelected(SeriesViewModel.SORT_TOP, 0, 20)?.let {
+                            mAdapter.setSeriesList(it)
+                        }
+                    }
+                    else -> {
+                        mAdapter.setTypeSelected(SeriesViewModel.SORT_UPCOMING)
+                        viewDataBinding.viewModel?.categoriesSelected(SeriesViewModel.SORT_UPCOMING, 0, 20)?.let {
+                            mAdapter.setSeriesList(it)
+                        }
+                    }
+                }
+                mAdapter.notifyDataSetChanged()
+            } else {
+                val oldSize = mAdapter.mSeriesList?.size
+                val to = 20 * (viewDataBinding.viewModel?.seriesRepository?.page?.value ?: 0)
+                if (actualPage < viewDataBinding.viewModel?.seriesRepository?.page?.value ?: 0) {
+                    actualPage = viewDataBinding.viewModel?.seriesRepository?.page?.value ?: 0
+                    val seriesSelected = viewDataBinding.viewModel?.categoriesSelected(typeSelected, 0, to)
+                    seriesSelected?.let {
+                        mAdapter.setSeriesList(it)
+                    }
+                    if (mAdapter.mSeriesList?.size?.rem(20) ?: 0 == 0
+                        && (mAdapter.mSeriesList?.size ?: 0) - 20 == oldSize
+                    ) {
+                        viewDataBinding.rvSeries.post {
+                            mAdapter.notifyItemRangeInserted(
+                                (mAdapter.mSeriesList?.size ?: 0) - 20,
+                                mAdapter.mSeriesList?.size ?: 0
+                            )
+                        }
+                    } else if (oldSize ?: 0 <= mAdapter.mSeriesList?.size ?: 0) {
+                        viewDataBinding.btLoad.visibility = View.VISIBLE
+                    }
+                } else if (actualPage > viewDataBinding.viewModel?.seriesRepository?.page?.value ?: 0){
+                    viewDataBinding.btLoad.visibility = View.VISIBLE
+                }
+            }
         })
 
         viewDataBinding.viewModel?.seriesRepository?.seriesCategories?.observe(this, Observer {
@@ -80,9 +132,39 @@ class SeriesFragment : Fragment(), SeriesAdapter.SerieClickListener {
         viewDataBinding.viewModel?.seriesRepository?.categories?.observe(this, Observer {
 
         })
+
+        viewDataBinding.viewModel?.seriesRepository?.page?.observe(this, Observer {
+
+        })
+
+        viewDataBinding.viewModel?.seriesRepository?.apiStatus?.observe(this, Observer {
+            if (it == ApiStatus.LOADING) {
+                viewDataBinding.tvEmpty.visibility = View.GONE
+                viewDataBinding.pbLoad.visibility = View.VISIBLE
+                viewDataBinding.pbLoadMore.visibility = View.GONE
+                viewDataBinding.rvSeries.visibility = View.GONE
+                viewDataBinding.btLoad.visibility = View.GONE
+            } else if (it == ApiStatus.APPENDING)  {
+                viewDataBinding.pbLoadMore.visibility = View.VISIBLE
+                viewDataBinding.pbLoad.visibility = View.GONE
+                viewDataBinding.rvSeries.visibility = View.VISIBLE
+                viewDataBinding.btLoad.visibility = View.GONE
+            } else if (it == ApiStatus.STOP) {
+                viewDataBinding.pbLoadMore.visibility = View.GONE
+                viewDataBinding.pbLoad.visibility = View.GONE
+                viewDataBinding.rvSeries.visibility = View.VISIBLE
+            } else {
+                viewDataBinding.pbLoadMore.visibility = View.GONE
+                viewDataBinding.pbLoad.visibility = View.GONE
+                viewDataBinding.rvSeries.visibility = View.VISIBLE
+                viewDataBinding.btLoad.visibility = View.VISIBLE
+            }
+        })
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        viewDataBinding.viewModel?.categoriesSelected?.clear()
+        actualPage = 1
         return when(item.itemId) {
             R.id.action_categories -> {
                 val view = layoutInflater.inflate(R.layout.categories, null)
@@ -104,9 +186,16 @@ class SeriesFragment : Fragment(), SeriesAdapter.SerieClickListener {
                 val alertDialog = AlertDialog.Builder(context!!)
                 alertDialog.setView(view)
                 alertDialog.setPositiveButton("UPDATE") { dialogInterface: DialogInterface, i: Int ->
-                    val series = viewDataBinding.viewModel?.categoriesSelected()!!
-                    val seriesSelected = series.createSubList(typeSelected, 0, 20)
-                    mAdapter.setSeriesList(seriesSelected)
+                    if (isNetworkAvailable()) {
+                        viewDataBinding.viewModel?.sortSeries(typeSelected, isNetworkAvailable(), true)
+                    }
+                    val series = viewDataBinding.viewModel?.categoriesSelected(typeSelected, 0, 20)!!
+                    mAdapter = SeriesAdapter(
+                        series,
+                        this,
+                        typeSelected
+                    )
+                    viewDataBinding.rvSeries.adapter = mAdapter
                     mAdapter.notifyDataSetChanged()
                     dialogInterface.dismiss()
                 }
@@ -115,42 +204,48 @@ class SeriesFragment : Fragment(), SeriesAdapter.SerieClickListener {
             }
             R.id.action_popular -> {
                 if (isNetworkAvailable()) {
-                    viewDataBinding.viewModel?.sortSeries(SeriesViewModel.SORT_POPULAR, isNetworkAvailable())
-                } else {
-                    viewDataBinding.viewModel?.categoriesSelected()?.createSubList(SeriesViewModel.SORT_POPULAR, 0,20)?.let {
-                        mAdapter.setSeriesList(it)
-                    }
-                    mAdapter.notifyDataSetChanged()
+                    viewDataBinding.viewModel?.sortSeries(SeriesViewModel.SORT_POPULAR, isNetworkAvailable(), true)
                 }
                 typeSelected = SeriesViewModel.SORT_POPULAR
+                mAdapter = SeriesAdapter(
+                    viewDataBinding.viewModel?.categoriesSelected(typeSelected, 0,20),
+                    this,
+                    typeSelected
+                )
+                viewDataBinding.rvSeries.adapter = mAdapter
+                mAdapter.notifyDataSetChanged()
                 (context as MainActivity).supportActionBar?.setTitle(R.string.popular_series)
                 title = R.string.popular_series
                 true
             }
             R.id.action_top -> {
                 if (isNetworkAvailable()) {
-                    viewDataBinding.viewModel?.sortSeries(SeriesViewModel.SORT_TOP, isNetworkAvailable())
-                } else {
-                    viewDataBinding.viewModel?.categoriesSelected()?.createSubList(SeriesViewModel.SORT_TOP, 0,20)?.let {
-                        mAdapter.setSeriesList(it)
-                    }
-                    mAdapter.notifyDataSetChanged()
+                    viewDataBinding.viewModel?.sortSeries(SeriesViewModel.SORT_TOP, isNetworkAvailable(), true)
                 }
                 typeSelected = SeriesViewModel.SORT_TOP
+                mAdapter = SeriesAdapter(
+                    viewDataBinding.viewModel?.categoriesSelected(typeSelected, 0,20),
+                    this,
+                    typeSelected
+                )
+                viewDataBinding.rvSeries.adapter = mAdapter
+                mAdapter.notifyDataSetChanged()
                 (context as MainActivity).supportActionBar?.setTitle(R.string.top_rated_series)
                 title = R.string.top_rated_series
                 true
             }
             R.id.action_upcoming -> {
                 if (isNetworkAvailable()) {
-                    viewDataBinding.viewModel?.sortSeries(SeriesViewModel.SORT_UPCOMING, isNetworkAvailable())
-                } else {
-                    viewDataBinding.viewModel?.categoriesSelected()?.createSubList(SeriesViewModel.SORT_UPCOMING, 0,20)?.let {
-                        mAdapter.setSeriesList(it)
-                    }
-                    mAdapter.notifyDataSetChanged()
+                    viewDataBinding.viewModel?.sortSeries(SeriesViewModel.SORT_UPCOMING, isNetworkAvailable(), true)
                 }
                 typeSelected = SeriesViewModel.SORT_UPCOMING
+                mAdapter = SeriesAdapter(
+                    viewDataBinding.viewModel?.categoriesSelected(typeSelected, 0,20),
+                    this,
+                    typeSelected
+                )
+                viewDataBinding.rvSeries.adapter = mAdapter
+                mAdapter.notifyDataSetChanged()
                 (context as MainActivity).supportActionBar?.setTitle(R.string.upcoming_series)
                 title = R.string.upcoming_series
                 true
@@ -167,40 +262,36 @@ class SeriesFragment : Fragment(), SeriesAdapter.SerieClickListener {
             bundle)
     }
 
+    override fun bottom() {
+        if (isNetworkAvailable()) {
+            viewDataBinding.viewModel?.sortSeries(typeSelected, isNetworkAvailable(), false)
+        } else {
+            val oldSize = mAdapter.mSeriesList?.size
+            if (oldSize ?: 0 >= 20) {
+                val seriesSelected = viewDataBinding.viewModel?.categoriesSelected(typeSelected, 0, (oldSize ?: 0) + 20)
+                seriesSelected?.let {
+                    mAdapter.setSeriesList(it)
+                }
+                if (((oldSize ?: 0) + 20) == mAdapter.mSeriesList?.size) {
+                    viewDataBinding.rvSeries.post {
+                        mAdapter.notifyItemRangeInserted(
+                            (mAdapter.mSeriesList?.size ?: 0) - 20,
+                            mAdapter.mSeriesList?.size ?: 0
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    override fun hide() {
+        viewDataBinding.btLoad.visibility = View.GONE
+    }
+
     private fun isNetworkAvailable(): Boolean {
         val connectivityManager = (context as MainActivity).getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetworkInfo = connectivityManager.activeNetworkInfo
         return activeNetworkInfo != null && activeNetworkInfo.isConnected
-    }
-
-    private fun List<Serie>.createSubList(type: String, from: Int, to: Int): List<Serie> {
-        return when (type) {
-            SeriesViewModel.SORT_POPULAR -> {
-                if (this.size >= to) {
-                    this.sortedByDescending { it.popularity }.subList(from, to)
-                } else {
-                    this.sortedByDescending { it.popularity }
-                }
-            }
-            SeriesViewModel.SORT_TOP -> {
-                if (this.size >= to) {
-                    this.sortedByDescending { it.voteAverage }.subList(from, to)
-                } else {
-                    this.sortedByDescending { it.voteAverage }
-                }
-            }
-            else -> {
-                val dateTimeStrToLocalDateTime: (Serie) -> Date = {
-                    val format: DateFormat = SimpleDateFormat("yyyy-M-d", Locale.getDefault())
-                    format.parse(it.firstAirDate)!!
-                }
-                if (this.size >= to) {
-                    this.sortedByDescending(dateTimeStrToLocalDateTime).subList(from, to)
-                } else {
-                    this.sortedByDescending(dateTimeStrToLocalDateTime)
-                }
-            }
-        }
     }
 
 }

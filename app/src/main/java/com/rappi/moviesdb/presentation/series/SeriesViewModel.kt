@@ -25,6 +25,7 @@ class SeriesViewModel(context: Context, networkConnection: Boolean) : ViewModel(
     val categoriesSelected = mutableListOf<Int>()
 
     init {
+        seriesRepository.page.value = 1
         if (networkConnection) {
             viewModelScope.launch {
                 seriesRepository.refreshCategories()
@@ -35,10 +36,13 @@ class SeriesViewModel(context: Context, networkConnection: Boolean) : ViewModel(
     companion object {
         const val SORT_POPULAR = "popular"
         const val SORT_TOP = "top_rated"
-        const val SORT_UPCOMING = "upcoming"
+        const val SORT_UPCOMING = "airing_today"
     }
 
-    fun sortSeries(sort: String, networkConnection: Boolean) {
+    fun sortSeries(sort: String, networkConnection: Boolean, init: Boolean) {
+        if (init) {
+            seriesRepository.page.value = 1
+        }
         if (networkConnection) {
             when (sort) {
                 SORT_POPULAR -> {
@@ -60,6 +64,7 @@ class SeriesViewModel(context: Context, networkConnection: Boolean) : ViewModel(
         }
     }
 
+
     fun select(category: Int) {
         categoriesSelected.add(category)
     }
@@ -68,22 +73,47 @@ class SeriesViewModel(context: Context, networkConnection: Boolean) : ViewModel(
         categoriesSelected.remove(category)
     }
 
-    fun categoriesSelected(): List<Serie> {
+    fun categoriesSelected(type: String, from: Int, to: Int): List<Serie> {
         if (categoriesSelected.isNotEmpty()) {
-            val moviesSelected = mutableListOf<Serie>()
-            seriesRepository.seriesCategories.value?.forEach { movieCategory ->
-                if (categoriesSelected.contains(movieCategory.genreId)) {
+            val seriesSelected = mutableListOf<Serie>()
+            seriesRepository.seriesCategories.value?.forEach { serieCategory ->
+                if (categoriesSelected.contains(serieCategory.genreId)) {
                     seriesRepository.series.value?.find {
-                        it.id == movieCategory.serieId
+                        it.id == serieCategory.serieId
                     }?.let {
-                        moviesSelected.add(it)
+                        seriesSelected.add(it)
                     }
                 }
             }
-            categoriesSelected.clear()
-            return moviesSelected.distinct()
+            return seriesSelected.distinct().createSubList(type, from, to)
         } else {
-            return seriesRepository.series.value!!
+            return seriesRepository.series.value?.createSubList(type, from, to) ?: mutableListOf()
+        }
+    }
+
+    private fun List<Serie>.createSubList(type: String, from: Int, to: Int): List<Serie> {
+        return when (type) {
+            SORT_POPULAR -> {
+                if (this.size >= to) {
+                    this.sortedByDescending { it.popularity }.subList(from, to)
+                } else {
+                    this.sortedByDescending { it.popularity }
+                }
+            }
+            SORT_TOP -> {
+                if (this.size >= to) {
+                    this.sortedByDescending { it.voteAverage }.subList(from, to)
+                } else {
+                    this.sortedByDescending { it.voteAverage }
+                }
+            }
+            else -> {
+                if (this.size >= to) {
+                    this.sortedByDescending { it.firstAirDate }.subList(from, to)
+                } else {
+                    this.sortedByDescending { it.firstAirDate }
+                }
+            }
         }
     }
 }

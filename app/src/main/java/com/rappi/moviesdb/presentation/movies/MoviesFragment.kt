@@ -152,7 +152,6 @@ class MoviesFragment : Fragment(), MoviesAdapter.MovieClickListener {
                 viewDataBinding.pbLoadMore.visibility = View.GONE
                 viewDataBinding.pbLoad.visibility = View.GONE
                 viewDataBinding.rvMovies.visibility = View.VISIBLE
-                viewDataBinding.btLoad.visibility = View.GONE
             } else {
                 viewDataBinding.pbLoadMore.visibility = View.GONE
                 viewDataBinding.pbLoad.visibility = View.GONE

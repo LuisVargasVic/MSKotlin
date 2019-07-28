@@ -9,20 +9,31 @@ import androidx.recyclerview.widget.RecyclerView
 import com.rappi.moviesdb.R
 import com.rappi.moviesdb.databinding.MovieItemBinding
 import com.rappi.moviesdb.domain.series.Serie
+import com.rappi.moviesdb.presentation.movies.MoviesViewModel
 import com.squareup.picasso.Picasso
 
 /**
  * Created by Luis Vargas on 2019-07-24.
  */
 
-class SeriesAdapter(var mSerieList: List<Serie>?, var mSerieClickListener: SerieClickListener) : RecyclerView.Adapter<SeriesAdapter.SeriesViewHolder>() {
+class SeriesAdapter(var mSeriesList: List<Serie>?, var mSerieClickListener: SerieClickListener, var mTypeSelected: String) : RecyclerView.Adapter<SeriesAdapter.SeriesViewHolder>() {
+
+    init {
+        setHasStableIds(true)
+    }
 
     interface SerieClickListener {
         fun serieClicked(serie: Serie?)
+        fun bottom()
+        fun hide()
     }
 
     fun setSeriesList(serieList: List<Serie>) {
-        mSerieList = serieList
+        mSeriesList = serieList
+    }
+
+    fun setTypeSelected(typeSelected: String) {
+        mTypeSelected = typeSelected
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SeriesViewHolder {
@@ -31,20 +42,30 @@ class SeriesAdapter(var mSerieList: List<Serie>?, var mSerieClickListener: Serie
             R.layout.movie_item,
             parent,
             false)
-        return SeriesViewHolder(dataBinding, mSerieClickListener)
+        return SeriesViewHolder(dataBinding, mSerieClickListener, mTypeSelected)
     }
 
     override fun onBindViewHolder(holder: SeriesViewHolder, position: Int) {
-        holder.bind(mSerieList?.get(position))
+        holder.bind(mSeriesList?.get(position))
+        if (position == itemCount - 1) {
+            mSerieClickListener.bottom()
+        } else {
+            mSerieClickListener.hide()
+        }
     }
 
     override fun getItemCount(): Int {
-        return mSerieList?.size ?: 0
+        return mSeriesList?.size ?: 0
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return position
     }
 
     class SeriesViewHolder(
         private val movieItemBinding: MovieItemBinding,
-        private val mSerieClickListener: SerieClickListener
+        private val mSerieClickListener: SerieClickListener,
+        private val mTypeSelected: String
     ) : RecyclerView.ViewHolder(movieItemBinding.root), View.OnClickListener {
 
         var mSerie: Serie? = null
@@ -59,7 +80,11 @@ class SeriesAdapter(var mSerieList: List<Serie>?, var mSerieClickListener: Serie
                 .get()
                 .load(Uri.parse(BASE_URL + serie?.posterPath))
                 .into(movieItemBinding.ivMovieImage)
-            movieItemBinding.tvMovieAverage.text = serie?.voteAverage.toString()
+            when (mTypeSelected) {
+                MoviesViewModel.SORT_POPULAR -> movieItemBinding.tvMovieAverage.text = serie?.popularity.toString()
+                MoviesViewModel.SORT_TOP -> movieItemBinding.tvMovieAverage.text = serie?.voteAverage.toString()
+                else -> movieItemBinding.tvMovieAverage.text = serie?.firstAirDate.toString()
+            }
         }
 
         override fun onClick(view: View) {
