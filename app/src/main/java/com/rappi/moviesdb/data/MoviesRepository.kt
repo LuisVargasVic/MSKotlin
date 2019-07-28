@@ -73,7 +73,7 @@ class MoviesRepository(private val database: MSDatabase) {
             }
         } catch (e: Exception) {
             Log.wtf("Errors", e.localizedMessage)
-            _apiStatus.value = ApiStatus.STOP
+            _apiStatus.value = ApiStatus.ERROR
         }
     }
 }

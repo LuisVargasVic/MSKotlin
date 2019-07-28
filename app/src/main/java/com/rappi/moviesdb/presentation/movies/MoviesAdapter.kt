@@ -26,6 +26,7 @@ class MoviesAdapter(var mMoviesList: List<Movie>?, var mMovieClickListener: Movi
     interface MovieClickListener {
         fun movieClicked(movie: Movie?)
         fun bottom()
+        fun hide()
     }
 
     fun setMoviesList(movieList: List<Movie>) {
@@ -49,6 +50,8 @@ class MoviesAdapter(var mMoviesList: List<Movie>?, var mMovieClickListener: Movi
         holder.bind(mMoviesList?.get(position))
         if (position == itemCount - 1) {
             mMovieClickListener.bottom()
+        } else {
+            mMovieClickListener.hide()
         }
     }
 

@@ -4,5 +4,6 @@ enum class ApiStatus {
     LOADING,
     STOP,
     APPENDING,
-    MAX
+    MAX,
+    ERROR
 }

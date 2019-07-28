@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.DialogInterface
 import android.net.ConnectivityManager
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -29,6 +28,7 @@ class MoviesFragment : Fragment(), MoviesAdapter.MovieClickListener {
     private var typeSelected = MoviesViewModel.SORT_POPULAR
     private lateinit var mAdapter: MoviesAdapter
     private var title = R.string.popular_movies
+    private var actualPage = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,8 +61,20 @@ class MoviesFragment : Fragment(), MoviesAdapter.MovieClickListener {
         )
         viewDataBinding.rvMovies.adapter = mAdapter
 
+        viewDataBinding.btLoad.setOnClickListener {
+            viewDataBinding.viewModel?.moviesRepository?.page?.value?.plus(1)
+            if (isNetworkAvailable()) {
+                viewDataBinding.viewModel?.sortMovies(typeSelected, isNetworkAvailable(), false)
+            }
+        }
+
+        actualPage = 1
         viewDataBinding.viewModel?.moviesRepository?.movies?.observe(this, Observer {
-            // size = it.size
+            if (it.isEmpty()){
+                viewDataBinding.tvEmpty.visibility = View.VISIBLE
+            } else {
+                viewDataBinding.tvEmpty.visibility = View.GONE
+            }
             if (viewDataBinding.viewModel?.moviesRepository?.page?.value ?: 1 == 1) {
                 when (typeSelected) {
                     MoviesViewModel.SORT_POPULAR -> {
@@ -86,26 +98,28 @@ class MoviesFragment : Fragment(), MoviesAdapter.MovieClickListener {
                 }
                 mAdapter.notifyDataSetChanged()
             } else {
-                Log.wtf("page", viewDataBinding.viewModel?.moviesRepository?.page?.value.toString())
-                val to = 20 * (viewDataBinding.viewModel?.moviesRepository?.page?.value ?: 0)
                 val oldSize = mAdapter.mMoviesList?.size
-                val moviesSelected = viewDataBinding.viewModel?.categoriesSelected(typeSelected, 0, to)
-                moviesSelected?.let {
-                    mAdapter.setMoviesList(it)
-                }
-                Log.wtf("size", mAdapter.mMoviesList?.size.toString())
-                if (((oldSize ?: 0) + 20) >= mAdapter.mMoviesList?.size ?: 0) {
-                    viewDataBinding.rvMovies.post {
-                        mAdapter.notifyItemRangeInserted(
-                            (mAdapter.mMoviesList?.size ?: 0) - 20,
-                            mAdapter.mMoviesList?.size ?: 0
-                        )
+                val to = 20 * (viewDataBinding.viewModel?.moviesRepository?.page?.value ?: 0)
+                if (actualPage < viewDataBinding.viewModel?.moviesRepository?.page?.value ?: 0) {
+                    actualPage = viewDataBinding.viewModel?.moviesRepository?.page?.value ?: 0
+                    val moviesSelected = viewDataBinding.viewModel?.categoriesSelected(typeSelected, 0, to)
+                    moviesSelected?.let {
+                        mAdapter.setMoviesList(it)
                     }
-                } else {
-                    viewDataBinding.viewModel?.moviesRepository?.page?.value?.plus(1)
-                    if (isNetworkAvailable()) {
-                        viewDataBinding.viewModel?.sortMovies(typeSelected, isNetworkAvailable(), false)
+                    if (mAdapter.mMoviesList?.size?.rem(20) ?: 0 == 0
+                        && (mAdapter.mMoviesList?.size ?: 0) - 20 == oldSize
+                    ) {
+                        viewDataBinding.rvMovies.post {
+                            mAdapter.notifyItemRangeInserted(
+                                (mAdapter.mMoviesList?.size ?: 0) - 20,
+                                mAdapter.mMoviesList?.size ?: 0
+                            )
+                        }
+                    } else if (oldSize ?: 0 <= mAdapter.mMoviesList?.size ?: 0) {
+                        viewDataBinding.btLoad.visibility = View.VISIBLE
                     }
+                } else if (actualPage > viewDataBinding.viewModel?.moviesRepository?.page?.value ?: 0){
+                    viewDataBinding.btLoad.visibility = View.VISIBLE
                 }
             }
         })
@@ -124,20 +138,33 @@ class MoviesFragment : Fragment(), MoviesAdapter.MovieClickListener {
 
         viewDataBinding.viewModel?.moviesRepository?.apiStatus?.observe(this, Observer {
             if (it == ApiStatus.LOADING) {
+                viewDataBinding.tvEmpty.visibility = View.GONE
                 viewDataBinding.pbLoad.visibility = View.VISIBLE
                 viewDataBinding.pbLoadMore.visibility = View.GONE
+                viewDataBinding.rvMovies.visibility = View.GONE
+                viewDataBinding.btLoad.visibility = View.GONE
             } else if (it == ApiStatus.APPENDING)  {
                 viewDataBinding.pbLoadMore.visibility = View.VISIBLE
                 viewDataBinding.pbLoad.visibility = View.GONE
+                viewDataBinding.rvMovies.visibility = View.VISIBLE
+                viewDataBinding.btLoad.visibility = View.GONE
+            } else if (it == ApiStatus.STOP) {
+                viewDataBinding.pbLoadMore.visibility = View.GONE
+                viewDataBinding.pbLoad.visibility = View.GONE
+                viewDataBinding.rvMovies.visibility = View.VISIBLE
+                viewDataBinding.btLoad.visibility = View.GONE
             } else {
                 viewDataBinding.pbLoadMore.visibility = View.GONE
                 viewDataBinding.pbLoad.visibility = View.GONE
+                viewDataBinding.rvMovies.visibility = View.VISIBLE
+                viewDataBinding.btLoad.visibility = View.VISIBLE
             }
         })
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         viewDataBinding.viewModel?.categoriesSelected?.clear()
+        actualPage = 1
         return when(item.itemId) {
             R.id.action_categories -> {
                 val view = layoutInflater.inflate(R.layout.categories, null)
@@ -255,6 +282,10 @@ class MoviesFragment : Fragment(), MoviesAdapter.MovieClickListener {
                 }
             }
         }
+    }
+
+    override fun hide() {
+        viewDataBinding.btLoad.visibility = View.GONE
     }
 
     private fun isNetworkAvailable(): Boolean {
