@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.rappi.moviesdb.R
-import com.rappi.moviesdb.databinding.MovieItemBinding
+import com.rappi.moviesdb.databinding.MsItemBinding
 import com.rappi.moviesdb.domain.movies.Movie
 import com.rappi.moviesdb.presentation.movies.MoviesViewModel.Companion.SORT_POPULAR
 import com.rappi.moviesdb.presentation.movies.MoviesViewModel.Companion.SORT_TOP
@@ -38,9 +38,9 @@ class MoviesAdapter(var mMoviesList: List<Movie>?, var mMovieClickListener: Movi
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MoviesViewHolder {
-        val dataBinding: MovieItemBinding = DataBindingUtil.inflate(
+        val dataBinding: MsItemBinding = DataBindingUtil.inflate(
             LayoutInflater.from(parent.context),
-            R.layout.movie_item,
+            R.layout.ms_item,
             parent,
             false)
         return MoviesViewHolder(dataBinding, mMovieClickListener, mTypeSelected)
@@ -64,15 +64,15 @@ class MoviesAdapter(var mMoviesList: List<Movie>?, var mMovieClickListener: Movi
     }
 
     class MoviesViewHolder(
-        private val movieItemBinding: MovieItemBinding,
+        private val msItemBinding: MsItemBinding,
         private val mMovieClickListener: MovieClickListener,
         private val mTypeSelected: String
-    ) : RecyclerView.ViewHolder(movieItemBinding.root), View.OnClickListener {
+    ) : RecyclerView.ViewHolder(msItemBinding.root), View.OnClickListener {
 
         var mMovie: Movie? = null
 
         init {
-            movieItemBinding.ivMovieImage.setOnClickListener(this)
+            msItemBinding.ivMovieImage.setOnClickListener(this)
         }
 
         fun bind(movie: Movie?) {
@@ -81,11 +81,11 @@ class MoviesAdapter(var mMoviesList: List<Movie>?, var mMovieClickListener: Movi
                 .get()
                 .load(Uri.parse(BASE_URL + movie?.posterPath))
                 .error(R.drawable.ic_photo)
-                .into(movieItemBinding.ivMovieImage)
+                .into(msItemBinding.ivMovieImage)
             when (mTypeSelected) {
-                SORT_POPULAR -> movieItemBinding.tvMovieAverage.text = movie?.popularity.toString()
-                SORT_TOP -> movieItemBinding.tvMovieAverage.text = movie?.voteAverage.toString()
-                else -> movieItemBinding.tvMovieAverage.text = movie?.releaseDate.toString()
+                SORT_POPULAR -> msItemBinding.tvMovieAverage.text = movie?.popularity.toString()
+                SORT_TOP -> msItemBinding.tvMovieAverage.text = movie?.voteAverage.toString()
+                else -> msItemBinding.tvMovieAverage.text = movie?.releaseDate.toString()
             }
         }
 

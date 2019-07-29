@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.rappi.moviesdb.R
-import com.rappi.moviesdb.databinding.MovieItemBinding
+import com.rappi.moviesdb.databinding.MsItemBinding
 import com.rappi.moviesdb.domain.series.Serie
 import com.rappi.moviesdb.presentation.movies.MoviesViewModel
 import com.squareup.picasso.Picasso
@@ -37,9 +37,9 @@ class SeriesAdapter(var mSeriesList: List<Serie>?, var mSerieClickListener: Seri
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SeriesViewHolder {
-        val dataBinding: MovieItemBinding = DataBindingUtil.inflate(
+        val dataBinding: MsItemBinding = DataBindingUtil.inflate(
             LayoutInflater.from(parent.context),
-            R.layout.movie_item,
+            R.layout.ms_item,
             parent,
             false)
         return SeriesViewHolder(dataBinding, mSerieClickListener, mTypeSelected)
@@ -63,15 +63,15 @@ class SeriesAdapter(var mSeriesList: List<Serie>?, var mSerieClickListener: Seri
     }
 
     class SeriesViewHolder(
-        private val movieItemBinding: MovieItemBinding,
+        private val msItemBinding: MsItemBinding,
         private val mSerieClickListener: SerieClickListener,
         private val mTypeSelected: String
-    ) : RecyclerView.ViewHolder(movieItemBinding.root), View.OnClickListener {
+    ) : RecyclerView.ViewHolder(msItemBinding.root), View.OnClickListener {
 
         var mSerie: Serie? = null
 
         init {
-            movieItemBinding.ivMovieImage.setOnClickListener(this)
+            msItemBinding.ivMovieImage.setOnClickListener(this)
         }
 
         fun bind(serie: Serie?) {
@@ -79,11 +79,11 @@ class SeriesAdapter(var mSeriesList: List<Serie>?, var mSerieClickListener: Seri
             Picasso
                 .get()
                 .load(Uri.parse(BASE_URL + serie?.posterPath))
-                .into(movieItemBinding.ivMovieImage)
+                .into(msItemBinding.ivMovieImage)
             when (mTypeSelected) {
-                MoviesViewModel.SORT_POPULAR -> movieItemBinding.tvMovieAverage.text = serie?.popularity.toString()
-                MoviesViewModel.SORT_TOP -> movieItemBinding.tvMovieAverage.text = serie?.voteAverage.toString()
-                else -> movieItemBinding.tvMovieAverage.text = serie?.firstAirDate.toString()
+                MoviesViewModel.SORT_POPULAR -> msItemBinding.tvMovieAverage.text = serie?.popularity.toString()
+                MoviesViewModel.SORT_TOP -> msItemBinding.tvMovieAverage.text = serie?.voteAverage.toString()
+                else -> msItemBinding.tvMovieAverage.text = serie?.firstAirDate.toString()
             }
         }
 
