@@ -1,4 +1,4 @@
-package com.rappi.moviesdb.remote
+package com.rappi.moviesdb.remote.categories
 
 import com.rappi.moviesdb.database.movies.DatabaseCategoryMovie
 import com.rappi.moviesdb.database.series.DatabaseCategorySerie

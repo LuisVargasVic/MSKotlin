@@ -35,7 +35,7 @@ interface MovieDao {
     fun deleteByMovieId(movieId: Int)
 
     @Query("SELECT * FROM DatabaseVideoMovie")
-    fun getVideos(): LiveData<List<DatabaseVideoMovie>>
+    fun getMovieVideos(): LiveData<List<DatabaseVideoMovie>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAllVideos(vararg movies: DatabaseVideoMovie)

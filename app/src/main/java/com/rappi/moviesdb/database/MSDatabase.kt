@@ -5,10 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.rappi.moviesdb.database.movies.*
-import com.rappi.moviesdb.database.series.DatabaseCategorySerie
-import com.rappi.moviesdb.database.series.DatabaseSerie
-import com.rappi.moviesdb.database.series.DatabaseSerieCategory
-import com.rappi.moviesdb.database.series.SerieDao
+import com.rappi.moviesdb.database.series.*
 import com.rappi.moviesdb.domain.Video
 import com.rappi.moviesdb.domain.movies.CategoryMovie
 import com.rappi.moviesdb.domain.movies.Movie
@@ -28,7 +25,8 @@ import com.rappi.moviesdb.domain.series.SerieCategory
     DatabaseCategorySerie::class,
     DatabaseSerie::class,
     DatabaseSerieCategory::class,
-    DatabaseVideoMovie::class
+    DatabaseVideoMovie::class,
+    DatabaseVideoSerie::class
 ], version = 1)
 abstract class MSDatabase : RoomDatabase() {
     abstract val movieDao: MovieDao
@@ -56,7 +54,7 @@ abstract class MSDatabase : RoomDatabase() {
         }
 
 
-        fun asDomainModel(list: List<DatabaseMovie>): List<Movie> {
+        fun movieAsDomainModel(list: List<DatabaseMovie>): List<Movie> {
             return list.map {
                 Movie(
                     it.id,
@@ -123,7 +121,7 @@ abstract class MSDatabase : RoomDatabase() {
             }
         }
 
-        fun videosAsDomainModel(list: List<DatabaseVideoMovie>): List<Video> {
+        fun movieVideosAsDomainModel(list: List<DatabaseVideoMovie>): List<Video> {
             return list.map {
                 Video(
                     it.id,
@@ -133,6 +131,20 @@ abstract class MSDatabase : RoomDatabase() {
                     it.size,
                     it.type,
                     it.movieId
+                )
+            }
+        }
+
+        fun serieVideosAsDomainModel(list: List<DatabaseVideoSerie>): List<Video> {
+            return list.map {
+                Video(
+                    it.id,
+                    it.key,
+                    it.name,
+                    it.site,
+                    it.size,
+                    it.type,
+                    it.serieId
                 )
             }
         }

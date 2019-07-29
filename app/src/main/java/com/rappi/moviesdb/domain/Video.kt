@@ -13,5 +13,5 @@ data class Video(
     val site: String,
     val size: Int?,
     val type: String,
-    val movieId: Int
+    val typeId: Int
 ): Serializable

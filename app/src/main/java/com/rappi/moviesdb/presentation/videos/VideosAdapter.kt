@@ -1,4 +1,4 @@
-package com.rappi.moviesdb.presentation.movies_detail
+package com.rappi.moviesdb.presentation.videos
 
 import android.content.Context
 import android.content.Intent
@@ -16,14 +16,14 @@ import com.squareup.picasso.Picasso
  * Created by Luis Vargas on 2019-07-28.
  */
 
-class VideosAdapter(val context: Context, var mMoviesList: List<Video>?) : RecyclerView.Adapter<VideosAdapter.VideosViewHolder>() {
+class VideosAdapter(val context: Context, var mVideosList: List<Video>?) : RecyclerView.Adapter<VideosAdapter.VideosViewHolder>() {
 
     init {
         setHasStableIds(true)
     }
 
-    fun setVideosList(movieList: List<Video>) {
-        mMoviesList = movieList
+    fun setVideosList(videoList: List<Video>) {
+        mVideosList = videoList
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideosViewHolder {
@@ -36,11 +36,11 @@ class VideosAdapter(val context: Context, var mMoviesList: List<Video>?) : Recyc
     }
 
     override fun onBindViewHolder(holder: VideosViewHolder, position: Int) {
-        holder.bind(mMoviesList?.get(position))
+        holder.bind(mVideosList?.get(position))
     }
 
     override fun getItemCount(): Int {
-        return mMoviesList?.size ?: 0
+        return mVideosList?.size ?: 0
     }
 
     override fun getItemViewType(position: Int): Int {

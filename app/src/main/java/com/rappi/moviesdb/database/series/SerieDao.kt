@@ -5,9 +5,6 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.rappi.moviesdb.database.series.DatabaseCategorySerie
-import com.rappi.moviesdb.database.series.DatabaseSerie
-import com.rappi.moviesdb.database.series.DatabaseSerieCategory
 
 /**
  * Created by Luis Vargas on 2019-07-24.
@@ -36,4 +33,10 @@ interface SerieDao {
 
     @Query("DELETE FROM DatabaseSerieCategory WHERE serieId = :serieId")
     fun deleteBySerieId(serieId: Int)
+
+    @Query("SELECT * FROM DatabaseVideoSerie")
+    fun getSerieVideos(): LiveData<List<DatabaseVideoSerie>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAllVideos(vararg movies: DatabaseVideoSerie)
 }

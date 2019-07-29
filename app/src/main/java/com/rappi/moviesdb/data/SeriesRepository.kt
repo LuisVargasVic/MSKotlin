@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import com.rappi.moviesdb.BuildConfig
 import com.rappi.moviesdb.database.MSDatabase
+import com.rappi.moviesdb.domain.Video
 import com.rappi.moviesdb.domain.series.CategorySerie
 import com.rappi.moviesdb.domain.series.Serie
 import com.rappi.moviesdb.domain.series.SerieCategory
@@ -35,6 +36,11 @@ class SeriesRepository(private val database: MSDatabase) {
     val seriesCategories: LiveData<List<SerieCategory>> =
         Transformations.map(database.serieDao.getSeriesCategories()) {
             MSDatabase.seriesCategoriesAsDomainModel(it)
+        }
+
+    val videos: LiveData<List<Video>> =
+        Transformations.map(database.serieDao.getSerieVideos()) {
+            MSDatabase.serieVideosAsDomainModel(it)
         }
 
     private val _apiStatus = MutableLiveData<ApiStatus>()
@@ -75,6 +81,17 @@ class SeriesRepository(private val database: MSDatabase) {
         } catch (e: Exception) {
             Log.wtf("Errors", e.localizedMessage)
             _apiStatus.value = ApiStatus.ERROR
+        }
+    }
+
+    suspend fun refreshVideos(videoId: Int) {
+        try {
+            withContext(Dispatchers.IO) {
+                val videos = Network.service.getSerieVideos(videoId, BuildConfig.API_KEY).await()
+                database.serieDao.insertAllVideos(*videos.serieVideosAsDatabaseModel())
+            }
+        } catch (e: Exception) {
+            Log.wtf("Errors", e.localizedMessage)
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.rappi.moviesdb.presentation.movies_detail
+package com.rappi.moviesdb.presentation.movie_detail
 
 import android.content.Context
 import android.net.ConnectivityManager
@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.rappi.moviesdb.databinding.FragmentMovieVideosBinding
 import com.rappi.moviesdb.domain.movies.Movie
 import com.rappi.moviesdb.presentation.MainActivity
+import com.rappi.moviesdb.presentation.videos.VideosAdapter
 import com.rappi.moviesdb.presentation.movies.MoviesFragment
 
 class MovieVideosFragment : Fragment() {

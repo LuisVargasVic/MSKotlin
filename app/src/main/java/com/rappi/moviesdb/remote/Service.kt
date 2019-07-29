@@ -1,5 +1,6 @@
 package com.rappi.moviesdb.remote
 
+import com.rappi.moviesdb.remote.categories.NetworkCategoryContainer
 import com.rappi.moviesdb.remote.movies.NetworkMovieContainer
 import com.rappi.moviesdb.remote.series.NetworkSerieContainer
 import com.rappi.moviesdb.remote.videos.NetworkVideoContainer
@@ -27,7 +28,10 @@ interface Service {
     fun getSeries(@Path("sort") sort: String, @Query("api_key") api: String, @Query("page") page: Int): Deferred<NetworkSerieContainer>
 
     @GET("movie/{movie_id}/videos")
-    fun getVideos(@Path("movie_id") movie_id: Int, @Query("api_key") api: String): Deferred<NetworkVideoContainer>
+    fun getMovieVideos(@Path("movie_id") movie_id: Int, @Query("api_key") api: String): Deferred<NetworkVideoContainer>
+
+    @GET("tv/{serie_id}/videos")
+    fun getSerieVideos(@Path("serie_id") movie_id: Int, @Query("api_key") api: String): Deferred<NetworkVideoContainer>
 
 }
 

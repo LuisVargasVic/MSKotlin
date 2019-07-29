@@ -16,7 +16,7 @@
 
     <fragment
             android:id="@+id/serieDetailScreen"
-            android:name="com.rappi.moviesdb.presentation.series.SerieDetailFragment"
+            android:name="com.rappi.moviesdb.presentation.serie_detail.SerieDetailFragment"
             tools:layout="@layout/fragment_serie_detail">
         <argument
                 android:name="movie"

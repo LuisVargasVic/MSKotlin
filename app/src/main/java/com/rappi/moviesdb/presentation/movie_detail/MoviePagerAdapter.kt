@@ -1,4 +1,4 @@
-package com.rappi.moviesdb.presentation.movies_detail
+package com.rappi.moviesdb.presentation.movie_detail
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment

@@ -1,6 +1,7 @@
-package com.rappi.moviesdb.presentation.series
+package com.rappi.moviesdb.presentation.serie_detail
 
 
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,7 +11,6 @@ import androidx.fragment.app.Fragment
 import com.rappi.moviesdb.R
 import com.rappi.moviesdb.databinding.FragmentSerieDetailBinding
 import com.rappi.moviesdb.domain.series.Serie
-import com.rappi.moviesdb.presentation.MainActivity
 import com.rappi.moviesdb.presentation.series.SeriesFragment.Companion.SERIE_KEY
 import com.squareup.picasso.Picasso
 
@@ -20,7 +20,6 @@ class SerieDetailFragment : Fragment() {
     private lateinit var serie: Serie
 
     companion object {
-        private const val BASE_URL_SMALL = "https://image.tmdb.org/t/p/w342"
         private const val BASE_URL = "https://image.tmdb.org/t/p/w780"
     }
 
@@ -40,23 +39,20 @@ class SerieDetailFragment : Fragment() {
     }
 
     fun setUpUI() {
-        Picasso
-            .get()
-            .load(Uri.parse(BASE_URL + serie.backdropPath))
-            .error(R.drawable.ic_panorama)
-            .into(viewDataBinding.ivDetailSerieBackdrop)
-        Picasso
-            .get()
-            .load(Uri.parse(BASE_URL_SMALL + serie.posterPath))
-            .error(R.drawable.ic_photo)
-            .into(viewDataBinding.ivDetailSerieImage)
-        (context as MainActivity).supportActionBar?.title = serie.name
-        viewDataBinding.tvDetailSerieVoteAverage.text = serie.voteAverage.toString()
-        viewDataBinding.tvDetailSerieFirstAirDate.text = serie.firstAirDate
-        viewDataBinding.tvDetailSerieVoteCount.text = serie.voteCount.toString()
-        viewDataBinding.tvDetailSeriePopularity.text = serie.popularity.toString()
-        viewDataBinding.tvDetailSerieOriginalLanguage.text = serie.originalLanguage
-        viewDataBinding.tvDetailSerieOverview.text = serie.overview
+        if(resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE){
+            viewDataBinding.ivDetailSerieBackdrop.visibility = View.GONE
+        } else {
+            Picasso
+                .get()
+                .load(Uri.parse(BASE_URL + serie.backdropPath))
+                .error(R.drawable.ic_panorama)
+                .into(viewDataBinding.ivDetailSerieBackdrop)
+        }
+        val adapter = SeriePagerAdapter(childFragmentManager, serie)
+        adapter.addFragment(SerieSynopsisFragment.newInstance(), getString(R.string.synopsis))
+        adapter.addFragment(SerieVideosFragment.newInstance(), getString(R.string.videos))
+        viewDataBinding.viewPager.adapter = adapter
+        viewDataBinding.tabLayout.setupWithViewPager(viewDataBinding.viewPager)
     }
 
 

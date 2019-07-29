@@ -29,7 +29,7 @@ class MoviesRepository(private val database: MSDatabase) {
 
     val movies: LiveData<List<Movie>> =
         Transformations.map(database.movieDao.getMovies()) {
-            MSDatabase.asDomainModel(it)
+            MSDatabase.movieAsDomainModel(it)
         }
 
     val moviesCategories: LiveData<List<MovieCategory>> =
@@ -38,8 +38,8 @@ class MoviesRepository(private val database: MSDatabase) {
         }
 
     val videos: LiveData<List<Video>> =
-        Transformations.map(database.movieDao.getVideos()) {
-            MSDatabase.videosAsDomainModel(it)
+        Transformations.map(database.movieDao.getMovieVideos()) {
+            MSDatabase.movieVideosAsDomainModel(it)
         }
 
     private val _apiStatus = MutableLiveData<ApiStatus>()
@@ -86,8 +86,8 @@ class MoviesRepository(private val database: MSDatabase) {
     suspend fun refreshVideos(videoId: Int) {
         try {
             withContext(Dispatchers.IO) {
-                val videos = Network.service.getVideos(videoId, BuildConfig.API_KEY).await()
-                database.movieDao.insertAllVideos(*videos.videosAsDatabaseModel())
+                val videos = Network.service.getMovieVideos(videoId, BuildConfig.API_KEY).await()
+                database.movieDao.insertAllVideos(*videos.movieVideosAsDatabaseModel())
             }
         } catch (e: Exception) {
             Log.wtf("Errors", e.localizedMessage)

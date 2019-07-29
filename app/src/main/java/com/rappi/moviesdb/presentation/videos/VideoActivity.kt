@@ -1,11 +1,10 @@
-package com.rappi.moviesdb.presentation.movies_detail
+package com.rappi.moviesdb.presentation.videos
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.rappi.moviesdb.R
 import com.rappi.moviesdb.databinding.ActivityVideoBinding
-import com.rappi.moviesdb.presentation.YoutubeFragment
 
 class VideoActivity : AppCompatActivity() {
 

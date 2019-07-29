@@ -9,7 +9,7 @@
 
         <variable
                 name="viewModel"
-                type="com.rappi.moviesdb.presentation.movie_detail.VideosViewModel"/>
+                type="com.rappi.moviesdb.presentation.serie_detail.SerieVideosViewModel"/>
 
     </data>
 

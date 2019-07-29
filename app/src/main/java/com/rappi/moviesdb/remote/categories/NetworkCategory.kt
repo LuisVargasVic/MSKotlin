@@ -1,4 +1,4 @@
-package com.rappi.moviesdb.remote
+package com.rappi.moviesdb.remote.categories
 
 /**
  * Created by Luis Vargas on 2019-07-24.

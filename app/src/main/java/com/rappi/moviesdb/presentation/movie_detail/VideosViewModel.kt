@@ -1,4 +1,4 @@
-package com.rappi.moviesdb.presentation.movies_detail
+package com.rappi.moviesdb.presentation.movie_detail
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
@@ -34,7 +34,7 @@ class VideosViewModel(movieId: Int, context: Context, networkConnection: Boolean
     fun videosSelected(movieId: Int): List<Video> {
         val videosSelected = mutableListOf<Video>()
         moviesRepository.videos.value?.forEach { it ->
-            if (it.movieId == movieId) {
+            if (it.typeId == movieId) {
                 videosSelected.add(it)
             }
         }

@@ -1,4 +1,4 @@
-package com.rappi.moviesdb.presentation.movies_detail
+package com.rappi.moviesdb.presentation.movie_detail
 
 import android.net.Uri
 import android.os.Bundle

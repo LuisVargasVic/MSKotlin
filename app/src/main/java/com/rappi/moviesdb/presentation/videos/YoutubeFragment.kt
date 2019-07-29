@@ -1,4 +1,4 @@
-package com.rappi.moviesdb.presentation
+package com.rappi.moviesdb.presentation.videos
 
 import android.os.Bundle
 import com.google.android.youtube.player.YouTubeInitializationResult
