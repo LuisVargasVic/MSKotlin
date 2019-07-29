@@ -21,12 +21,14 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             buildConfigField "String", "API_KEY", '"eba4a8974aebe5455a18df1946b358c2"'
+            buildConfigField "String", "YT_API_KEY", '"AIzaSyCoBaqkyigzW8iufVRCMoOTuLq5JCk01Jc"'
         }
         debug {
             debuggable true
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField "String", "API_KEY", '"eba4a8974aebe5455a18df1946b358c2"'
+            buildConfigField "String", "YT_API_KEY", '"AIzaSyCoBaqkyigzW8iufVRCMoOTuLq5JCk01Jc"'
         }
     }
 
@@ -64,4 +66,5 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'androidx.navigation:navigation-runtime:2.0.0'
+    implementation files('libs/YouTubeAndroidPlayerApi.jar')
 }

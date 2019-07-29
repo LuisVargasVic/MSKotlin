@@ -20,5 +20,5 @@ object Network {
         .client(OkHttpClient.Builder().build())
         .build()
 
-    val service = retrofit.create(MovieService::class.java)
+    val service = retrofit.create(Service::class.java)
 }
