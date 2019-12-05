@@ -11,7 +11,7 @@
 
         <variable
                 name="viewModel"
-                type="com.rappi.moviesdb.presentation.series.SeriesViewModel"/>
+                type="com.venkonenterprise.mskotlin.presentation.series.SeriesViewModel"/>
 
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout

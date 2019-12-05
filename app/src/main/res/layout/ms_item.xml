@@ -5,11 +5,11 @@
     <data>
         <variable
                 name="movie"
-                type="com.rappi.moviesdb.domain.movies.Movie" />
+                type="com.venkonenterprise.mskotlin.domain.movies.Movie" />
 
         <variable
                 name="movieListener"
-                type="com.rappi.moviesdb.presentation.movies.MoviesAdapter" />
+                type="com.venkonenterprise.mskotlin.presentation.movies.MoviesAdapter" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:dist="http://schemas.android.com/apk/distribution"
           xmlns:tools="http://schemas.android.com/tools"
-          package="com.rappi.moviesdb">
+          package="com.venkonenterprise.mskotlin">
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
@@ -18,11 +18,11 @@
             android:theme="@style/AppTheme"
             tools:ignore="GoogleAppIndexingWarning">
         <activity
-                android:name=".presentation.videos.VideoActivity"
+                android:name="com.venkonenterprise.mskotlin.presentation.videos.VideoActivity"
                 android:configChanges="keyboardHidden|orientation|screenSize"
                 android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".presentation.MainActivity">
+        <activity android:name="com.venkonenterprise.mskotlin.presentation.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 

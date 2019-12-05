@@ -9,7 +9,7 @@
 
         <variable
                 name="viewModel"
-                type="com.rappi.moviesdb.presentation.movie_detail.VideosViewModel"/>
+                type="com.venkonenterprise.mskotlin.presentation.movie_detail.VideosViewModel"/>
 
     </data>
 
